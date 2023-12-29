@@ -15,7 +15,7 @@ deck = Deck(all_sprites)
 deck.add_sprite(all_sprites)
 store = Store()
 store.add_sprites(all_sprites)
-print(all_sprites)
+
 pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
 pygame.draw.line(screen, 'black', (0, 515), (360, 515))
 
