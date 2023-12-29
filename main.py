@@ -1,27 +1,11 @@
 import pygame
-import sys
-import os
+from consts import load_image
+from card_cl import Card, Deck
 
 pygame.init()
 size = width, height = 450, 600
 screen = pygame.display.set_mode(size)
 screen.fill('white')
-
-
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    if colorkey is not None:
-        image = image.convert()
-        if colorkey == -1:
-            colorkey = image.get_at((0, 0))
-        image.set_colorkey(colorkey)
-    else:
-        image = image.convert_alpha()
-    return image
 
 
 class GoldCoin(pygame.sprite.Sprite):
@@ -46,6 +30,7 @@ class GoldCoin(pygame.sprite.Sprite):
 all_sprites = pygame.sprite.Group()
 running = True
 goldCoin = GoldCoin(all_sprites)
+deck = Deck(all_sprites)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
