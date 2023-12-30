@@ -25,6 +25,7 @@ class Deck(pygame.sprite.Sprite):
 
     def __init__(self, group, cur_card='knight'):
         super().__init__(group)
+        self.group = group
         self.image = load_image(Deck.image)
         self.rect = self.image.get_rect()
         self.cur_card = Card(all_sprites, cur_card)
@@ -32,16 +33,19 @@ class Deck(pygame.sprite.Sprite):
         self.cur_card.rect.y = 300
         self.rect.x = 400
         self.rect.y = 300
+        self.group.add(self.cur_card)
 
     def take_card(self):
         card = self.cur_card
-        self.cur_card = Card(all_sprites, choice(list(CLASSES.keys())))  # переделать
+        # self.cur_card = Card(all_sprites, choice(list(CLASSES.keys())))  # переделать
+        self.cur_card = Card(all_sprites, 'knight')
         self.cur_card.rect.x = 410
-        self.cur_card.rect.y = 290
+        self.cur_card.rect.y = 300
+        self.group.add(self.cur_card)
         return card
 
-    def add_sprite(self, group):
-        group.add(self.cur_card)
+    def is_concerning(self, pos):
+        return bool(self.rect.collidepoint(*pos))
 
 
 def main():

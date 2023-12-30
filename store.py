@@ -27,15 +27,12 @@ class Store:
 
         self.cur_cards = [first, second, third, fourth]
 
-    def take_cards(self, pos, group):
-        res = self.is_concerning(pos)
-        if res[0]:
-            ind = res[1]
-            card = self.cur_cards[ind]
-            self.cur_cards[ind] = Card(all_sprites, 'knight')  # choice(list(CLASSES.keys()))
-            self.cur_cards[ind].rect.x, self.cur_cards[ind].rect.y = self.poses[ind + 1]
-            group.add(self.cur_cards[ind])
-            return card
+    def take_cards(self, ind, group):
+        card = self.cur_cards[ind]
+        self.cur_cards[ind] = Card(all_sprites, 'knight')  # choice(list(CLASSES.keys()))
+        self.cur_cards[ind].rect.x, self.cur_cards[ind].rect.y = self.poses[ind + 1]
+        group.add(self.cur_cards[ind])
+        return card
 
     def update(self):
         for card in self.cur_cards:
