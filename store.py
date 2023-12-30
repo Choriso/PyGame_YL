@@ -34,9 +34,8 @@ class Store:
         group.add(self.cur_cards[ind])
         return card
 
-    def update(self):
-        for card in self.cur_cards:
-            card.update()
+    def update(self, surface):
+        self.draw_prices(surface)
 
     def add_sprites(self, group):
         for card in self.cur_cards:

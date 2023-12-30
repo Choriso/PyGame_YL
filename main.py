@@ -23,7 +23,8 @@ class Game:
         self.store.draw_prices(screen)
 
     def update(self):
-        self.store.update()
+        self.store.update(screen)
+        self.hand.update()
 
     def take_card_store(self, pos):
         card = self.store.take_cards(pos, all_sprites)
@@ -37,15 +38,16 @@ class Game:
     def action(self, pos):
         res1 = self.store.is_concerning(pos)
         res2 = self.deck.is_concerning(pos)
-        if res1[0]:
-            card = self.store.take_cards(res1[1], all_sprites)
-            price = self.store.costs(card)
-            result = self.goldCoin.buy(price)
-            if result:
+        if self.hand.can_add():
+            if res1[0]:
+                card = self.store.take_cards(res1[1], all_sprites)
+                price = self.store.costs(card)
+                result = self.goldCoin.buy(price)
+                if result:
+                    self.hand.add_card(card)
+            elif res2:
+                card = self.deck.take_card()
                 self.hand.add_card(card)
-        elif res2:
-            card = self.deck.take_card()
-            self.hand.add_card(card)
 
 
 running = True
@@ -61,8 +63,12 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             game.action(event.pos)
 
+    screen.fill('white')
+    pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
+    pygame.draw.line(screen, 'black', (0, 515), (360, 515))  # закинуть в рисовалку поля
     all_sprites.draw(screen)
     all_sprites.update()
+    game.update()
     pygame.display.flip()
 
 pygame.quit()
