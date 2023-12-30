@@ -14,6 +14,7 @@ class Card(pygame.sprite.Sprite):
 
     def __init__(self, group, link):
         super().__init__(group)
+        self.name = link
         self.image = pygame.transform.scale(load_image(IMAGES[link]), (30, 40))
         self.rect = self.image.get_rect()
         self.link = CLASSES[link]

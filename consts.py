@@ -25,7 +25,23 @@ IMAGES = {
     'archer': ...,
     'fence': ...,
     'wall': ...,
-    'thorn': ...,  # колючка
+    'thorn': ...,
+    'canon': ...,
+    'catapult': ...,
+    'gold mine': ...,
+    'freeze': ...,
+    'bomb': ...,
+}
+
+PRICES = {
+    'knight': 1,
+    'cavalry': ...,
+    'prince': ...,
+    'halberdier': ...,
+    'archer': ...,
+    'fence': ...,
+    'wall': ...,
+    'thorn': ...,
     'canon': ...,
     'catapult': ...,
     'gold mine': ...,

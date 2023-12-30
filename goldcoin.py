@@ -26,6 +26,13 @@ class GoldCoin(pygame.sprite.Sprite):
         pos = self.gold_to_pos[len(str(self.gold))]
         screen.blit(text, pos)
 
+    def buy(self, price):
+        if self.gold >= price:
+            self.gold -= price
+            self.gold = max(self.gold, 0)
+            return True
+        return False
+
 
 def main():
     running = True
