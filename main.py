@@ -3,6 +3,7 @@ from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
 from hand import Hand
+from startscreen import start_screen
 
 pygame.init()
 size = width, height = 450, 600
@@ -51,6 +52,7 @@ class Game:
 
 
 running = True
+start_screen()
 game = Game()
 pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
 pygame.draw.line(screen, 'black', (0, 515), (360, 515))  # закинуть в рисовалку поля
