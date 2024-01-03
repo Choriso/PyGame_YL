@@ -11,6 +11,7 @@ class Hand:
     def __init__(self):
         self.hand = []
         self.card_cnt = 0
+        self.chosen = None
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
 
     def update(self):
@@ -33,6 +34,9 @@ class Hand:
         for cnt, x in not_visited.values():
             text = self.font.render(f'X{cnt}', 1, "black")
             screen.blit(text, (x + 20, 518))
+        if self.chosen:
+            self.chosen.rect.x = 315
+            self.chosen.rect.y = 525
 
     def add_card(self, card):
         self.hand.append(card)
@@ -46,3 +50,15 @@ class Hand:
 
     def can_add(self):
         return self.card_cnt <= 9
+
+    def is_concerning(self, pos):
+        for i in range(len(self.hand)):
+            if self.hand[i].rect.collidepoint(*pos):
+                return i
+        return False
+
+    def choose(self, ind):
+        if self.chosen:
+            self.hand.append(self.chosen)
+        self.chosen = self.hand.pop(ind)
+

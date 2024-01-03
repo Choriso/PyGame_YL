@@ -29,6 +29,7 @@ class Game:
     def update(self):
         pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
         pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
+        pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         self.field.draw(screen)
         self.store.update(screen)
         self.hand.update()
@@ -36,6 +37,8 @@ class Game:
     def action(self, pos):
         res1 = self.store.is_concerning(pos)
         res2 = self.deck.is_concerning(pos)
+        res3 = self.hand.is_concerning(pos)
+        res4 = self.field.get_click(pos)
         if self.hand.can_add():
             if res1[0]:
                 card = self.store.take_cards(res1[1], all_sprites)
@@ -46,12 +49,13 @@ class Game:
             elif res2:
                 card = self.deck.take_card()
                 self.hand.add_card(card)
+            elif type(res3) is int:
+                self.hand.choose(res3)
 
 
 running = True
 start_screen()
 game = Game()
-
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:

@@ -1,6 +1,6 @@
 import pygame
 import sys
-from consts import load_image
+from load_image import load_image
 
 
 def terminate():

@@ -1,5 +1,5 @@
 import pygame
-from consts import load_image
+from load_image import load_image
 
 pygame.init()
 size = width, height = 450, 600

@@ -1,6 +1,7 @@
 import pygame
 from random import choice
-from consts import IMAGES, CLASSES, load_image
+from consts import IMAGES, CLASSES
+from load_image import load_image
 
 pygame.init()
 size = width, height = 450, 600

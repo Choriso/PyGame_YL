@@ -19,6 +19,7 @@ class Field:
         self.size = size
         self.bg_color = bg_color
         self.cells = [[Cell(x * self.cell_size, y * self.cell_size, tilemap.subsurface(pygame.Rect(random.randrange(0, tilemap.get_width(), 16), random.randrange(0, tilemap.get_height(), 16), 16, 16)), self.cell_size) for x in range(size[0])] for y in range(size[1])]
+        self.field = [[0] * size[0] for i in range(size[1])]
 
     def draw(self, screen):
         # screen.fill(self.bg_color)
@@ -40,12 +41,14 @@ class Field:
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
-        self.on_click(cell)
+        if cell:
+            self.on_click(cell)
+
 
     def get_cell(self, mouse_pos):
         cell_x = (mouse_pos[0] - self.left) // self.cell_size
         cell_y = (mouse_pos[1] - self.top) // self.cell_size
-        if cell_x < 0 or cell_x >= self.size or cell_y < 0 or cell_y >= self.size:
+        if cell_x < 0 or cell_x >= self.size[0] or cell_y < 0 or cell_y >= self.size[1]:
             return None
         return cell_x, cell_y
 
