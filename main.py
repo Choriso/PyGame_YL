@@ -51,11 +51,9 @@ class Game:
                 result = self.goldCoin.buy(price)
                 if result:
                     self.hand.add_card(card)
-                    print(2)
             elif res2:
                 card = self.deck.take_card()
                 self.hand.add_card(card)
-                print(1)
 
 
 running = True
