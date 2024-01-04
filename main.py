@@ -51,11 +51,17 @@ class Game:
                 self.hand.add_card(card)
             elif type(res3) is int:
                 self.hand.choose(res3)
+            elif res4 and self.hand.chosen:
+                result = self.field.on_click(res4, all_sprites, self.hand.chosen)
+                if result:
+                    all_sprites.remove(self.hand.chosen)
+                    self.hand.chosen = None
 
 
 running = True
 start_screen()
 game = Game()
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -65,9 +71,9 @@ while running:
             game.action(event.pos)
 
     screen.fill('white')
+    game.update()
     all_sprites.draw(screen)
     all_sprites.update()
-    game.update()
     pygame.display.flip()
 
 pygame.quit()

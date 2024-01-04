@@ -1,10 +1,7 @@
 import pygame
 import sys
 import random
-
-import pygame
-import sys
-import random
+from consts import CLASSES
 
 class Cell:
     def __init__(self, x, y, image, cell_size):
@@ -42,7 +39,8 @@ class Field:
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         if cell:
-            self.on_click(cell)
+            print(self.field[cell[1]][cell[0]])
+        return cell
 
 
     def get_cell(self, mouse_pos):
@@ -52,9 +50,14 @@ class Field:
             return None
         return cell_x, cell_y
 
-    def on_click(self, cell_coords):
-        print("Click", cell_coords)
-
+    def on_click(self, cell_coords, group, card):
+        if self.field[cell_coords[1]][cell_coords[0]]:
+            return False
+        hero = card.link(group)
+        self.field[cell_coords[1]][cell_coords[0]] = hero.name
+        hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
+        hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
+        return True
 
 
 class Shop:

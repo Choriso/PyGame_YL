@@ -1,5 +1,6 @@
+from heroes import Knight
 CLASSES = {
-    'knight': ...,
+    'knight': Knight,
     'cavalry': ...,
     'prince': ...,
     'halberdier': ...,
