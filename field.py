@@ -74,7 +74,8 @@ class Field:
     def move_hero(self, start_pos, end_pos, hero):
         self.field[start_pos[0]][start_pos[1]], self.field[end_pos[0]][end_pos[1]] = 0, self.field[start_pos[0]][
             start_pos[1]]
-        hero.rect.y -= (end_pos[1] - start_pos[1]) * self.cell_size
+        hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
+
 
 
 
