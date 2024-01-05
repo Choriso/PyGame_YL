@@ -28,8 +28,12 @@ class Hand:
                 x += 36
             else:
                 if card.name in not_visited:
+                    card.rect.x = not_visited[card.name][1]
+                    card.rect.y = 520
                     not_visited[card.name][0] += 1
                 else:
+                    card.rect.x = pos[card.name]
+                    card.rect.y = 520
                     not_visited[card.name] = [2, pos[card.name]]
         for cnt, x in not_visited.values():
             text = self.font.render(f'X{cnt}', 1, "black")

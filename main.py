@@ -40,13 +40,17 @@ class Game:
             self.field.draw_move_hints(*self.hints_params)
 
     def action(self, pos):
+        # узнает куда тыкнул игрок
         res1 = self.store.is_concerning(pos)
         res2 = self.deck.is_concerning(pos)
         res3 = self.hand.is_concerning(pos)
         res4 = self.field.get_click(pos)
+
+        # проверяет стоит ли убирать подсказки для хода
         if self.is_showing_move_hints and not res4:
             self.is_showing_move_hints = False
             self.hints_params = None
+
         if self.hand.can_add():
             if res1[0]:
                 card = self.store.take_cards(res1[1], all_sprites)
@@ -57,23 +61,26 @@ class Game:
             elif res2:
                 card = self.deck.take_card()
                 self.hand.add_card(card)
-            elif type(res3) is int:
-                self.hand.choose(res3)
-            elif res4:
-                result = False
-                if self.hand.chosen:
-                    result = self.field.on_click(res4, all_sprites, self.hand.chosen)
-                    if result:
-                        all_sprites.remove(self.hand.chosen)
-                        self.hand.chosen = None
-                if result is False:
-                    hero = self.field.get_piece(res4)
-                    if hero:
-                        self.field.draw_move_hints(hero.dist_range, res4, screen)
-                        self.hints_params = hero.dist_range, res4, screen
-                        self.is_showing_move_hints = True
-                        print(1)
-                    elif self.is_showing_move_hints and res4[1] not in [self.hints_params[1][1] + i for i in range(1, self.hints_params[0] + 1)]:
+        if type(res3) is int:
+            self.hand.choose(res3)
+        elif res4:
+            result = False
+            if self.hand.chosen:
+                result = self.field.on_click(res4, all_sprites, self.hand.chosen)
+                if result:
+                    all_sprites.remove(self.hand.chosen)
+                    self.hand.chosen = None
+            if result is False:
+                hero = self.field.get_piece(res4)
+                if hero:
+                    self.field.draw_move_hints(hero.dist_range, res4, screen)
+                    self.hints_params = hero.dist_range, res4, screen
+                    self.is_showing_move_hints = True
+                elif self.is_showing_move_hints:
+                    if res4[1] in [self.hints_params[1][1] - i for i in
+                                       range(1, self.hints_params[0] + 1)] and  res4[0] == self.hints_params[1][0]:
+                        print('MOVE!!!')
+                    else:
                         self.is_showing_move_hints = False
                         self.hints_params = None
 
