@@ -29,7 +29,7 @@ class Store:
 
     def take_cards(self, ind, group):
         card = self.cur_cards[ind]
-        self.cur_cards[ind] = Card(all_sprites, 'knight')  # choice(list(CLASSES.keys()))
+        self.cur_cards[ind] = Card(all_sprites, choice(('knight', 'archer')))  # choice(list(CLASSES.keys()))
         self.cur_cards[ind].rect.x, self.cur_cards[ind].rect.y = self.poses[ind + 1]
         group.add(self.cur_cards[ind])
         return card
