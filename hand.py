@@ -65,4 +65,5 @@ class Hand:
         if self.chosen:
             self.hand.append(self.chosen)
         self.chosen = self.hand.pop(ind)
+        self.card_cnt -= 1
 

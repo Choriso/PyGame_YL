@@ -1,11 +1,12 @@
-from heroes import Knight, Archer
+from heroes import *
 
 CLASSES = {
     'knight': Knight,
-    'cavalry': Archer,
-    'prince': ...,
-    'halberdier': ...,
-    'archer': ...,
+    'archer': Archer,
+    'axeman': Axeman,
+    'halberdier': Halberdier,
+    'cavalry': Cavalry,
+    'rogue': Rogue,
     'fence': ...,
     'wall': ...,
     'thorn': ...,  # колючка
@@ -17,10 +18,10 @@ CLASSES = {
 }
 IMAGES = {
     'knight': 'Пехота.png',
-    'cavalry': 'Конница.png',
-    'prince': "Тяжелый боец.png",
-    'halberdier': "Алебардист.png",
     'archer': "Лучник.png",
+    'axeman': "Тяжёлый боец.png",
+    'halberdier': "Алебардист.png",
+    'cavalry': 'Конница.png',
     'rogue': 'Проныра.png',
     'fence': "",
     'wall': "",
@@ -34,10 +35,11 @@ IMAGES = {
 
 PRICES = {
     'knight': 1,
-    'cavalry': ...,
-    'prince': ...,
-    'halberdier': ...,
     'archer': 1,
+    'axeman': 2,
+    'halberdier': 2,
+    'cavalry': 2,
+    'rogue': 2,
     'fence': ...,
     'wall': ...,
     'thorn': ...,

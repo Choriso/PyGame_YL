@@ -76,58 +76,6 @@ class Field:
             start_pos[1]]
         hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
 
-
-
-
-class Shop:
-    def __init__(self, screen, top, left, width, height):
-        self.screen = screen
-        self.rect = pygame.Rect(left, top, width, height)
-        self.cards = ["Card1", "Card2", "Card3"]
-
-    def draw(self):
-        pygame.draw.rect(self.screen, (255, 255, 255), self.rect, 2)
-        for i, card in enumerate(self.cards):
-            card_rect = pygame.Rect(self.rect.left + 10, self.rect.top + 10 + i * 70, 60, 60)
-            pygame.draw.rect(self.screen, (255, 255, 255), card_rect)
-
-    def click(self, pos):
-        if self.rect.collidepoint(pos):
-            print("Bought a card")
-
-
-class Deck:
-    def __init__(self, screen, top, left, width, height):
-        self.screen = screen
-        self.rect = pygame.Rect(left, top, width, height)
-        self.cards = ["A", "B", "C", "D"]
-
-    def draw(self):
-        pygame.draw.rect(self.screen, (255, 255, 255), self.rect)
-
-    def click(self, pos):
-        if self.rect.collidepoint(pos):
-            print("Drew a random card")
-
-
-class Interface:
-    def __init__(self, screen, tilemap, coins):
-        self.screen = screen
-        self.field = Field(9, tilemap, (0, 0, 0))
-        self.shop = Shop(screen, 10, 600, 180, 280)
-        self.deck = Deck(screen, 300, 600, 180, 180)
-        self.coins = coins
-
-    def draw(self):
-        self.field.draw(self.screen)
-        self.shop.draw()
-        self.deck.draw()
-
-    def click(self, pos):
-        self.shop.click(pos)
-        self.deck.click(pos)
-
-
 def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))

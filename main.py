@@ -21,7 +21,7 @@ class Game:
         self.deck = Deck(all_sprites)
         self.store = Store()
         self.hand = Hand()
-        tilemap = pygame.image.load('data/TexturedGrass.png')
+        tilemap = pygame.image.load('data\TexturedGrass.png')
         self.field = Field((21, 30), tilemap, 'white')
 
         # добавляются спрайты и рисуются цены
@@ -57,11 +57,11 @@ class Game:
         if self.hand.can_add():  # можно ли добавить в руку карту если нет то нет смысла проверять колоду и магазин
             if res1[0]:
                 # берется карта и отдаются деньги
-                # ВОЗМОЖНО БАГ ПРОВЕРИТЬ КОГДА БУДУТ ДРУГИЕ КАРТЫ
-                card = self.store.take_cards(res1[1], all_sprites)
+                card = self.store.cur_cards[res1[1]]
                 price = self.store.costs(card)
                 result = self.goldCoin.buy(price)
                 if result:
+                    self.store.take_cards(res1[1], all_sprites)
                     self.hand.add_card(card)
             elif res2:
                 # просто берется карта и добавляется
