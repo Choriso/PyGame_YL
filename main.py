@@ -5,6 +5,7 @@ from goldcoin import GoldCoin
 from hand import Hand
 from startscreen import start_screen
 from field import Field
+from heart import Heart
 
 pygame.init()
 size = width, height = 450, 600
@@ -23,6 +24,8 @@ class Game:
         self.hand = Hand()
         tilemap = pygame.image.load('data\TexturedGrass.png')
         self.field = Field((21, 30), tilemap, 'white')
+        self.heart = Heart(all_sprites,
+                           (493, self.field.size[0] // 2 * self.field.cell_size + self.field.left))
 
         # добавляются спрайты и рисуются цены
         self.store.add_sprites(all_sprites)
@@ -95,6 +98,9 @@ class Game:
                         self.field.move_hero(start, end, hero)
                     self.is_showing_move_hints = False
                     self.hints_params = None
+
+    def game_is_continue(self):
+        return self.heart.hp > 0
 
 
 running = True
