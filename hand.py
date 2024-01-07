@@ -15,6 +15,7 @@ class Hand:
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
 
     def update(self):
+
         x = 2
         visited = []
         not_visited = {}
@@ -35,12 +36,14 @@ class Hand:
                     card.rect.x = pos[card.name]
                     card.rect.y = 520
                     not_visited[card.name] = [2, pos[card.name]]
-        for cnt, x in not_visited.values():
-            text = self.font.render(f'X{cnt}', 1, "black")
-            screen.blit(text, (x + 20, 518))
         if self.chosen:
             self.chosen.rect.x = 315
             self.chosen.rect.y = 525
+
+        font = pygame.font.SysFont('default', 30, italic=False, bold=False)
+        for cnt, x in not_visited.values():
+            text = font.render(f'X{cnt}', 1, "black")
+            screen.blit(text, (x + 20, 518))
 
     def add_card(self, card):
         self.hand.append(card)

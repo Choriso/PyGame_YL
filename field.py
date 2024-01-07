@@ -2,6 +2,7 @@ import pygame
 import sys
 import random
 from consts import CLASSES
+from heroes import Hero
 
 
 class Cell:
@@ -42,6 +43,33 @@ class Field:
                     pygame.draw.line(screen, (0, 0, 0), (y + self.left, x + self.top),
                                      (y + dash_length + self.left, x + self.top))
 
+    def update(self, group):
+        under_attack = [[0] * self.size[0] for _ in range(self.size[1])]
+        for i in range(self.size[1]):
+            for j in range(self.size[0]):
+                if isinstance(self.field[i][j], Hero):
+                    hero = self.field[i][j]
+                    under_attack[i][j] = (hero.color, hero.damage)
+                    if hero.color == 'blue':
+                        for x in range(1, hero.attack_range + 1):
+                            if i - x >= 0:
+                                under_attack[i - x][j] = ('blue', hero.damage)
+                    else:
+                        for x in range(-hero.attack_range, 0):
+                            if i + x < self.size[1]:
+                                under_attack[i + x][j] = ('red', hero.damage)
+        for i in range(self.size[1]):
+            for j in range(self.size[0]):
+                if under_attack[i][j] and isinstance(self.field[i][j], Hero):
+                    hero = self.field[i][j]
+                    if hero.color != under_attack[i][j][0]:
+                        hero.beat(under_attack[i][j][1])
+                        res = hero.is_alive()
+                        if not res:
+                            group.remove(hero)
+                            self.field[i][j] = 0
+                            # еще можно дать вознаграждение за это
+
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         return cell
@@ -75,6 +103,12 @@ class Field:
         self.field[start_pos[0]][start_pos[1]], self.field[end_pos[0]][end_pos[1]] = 0, self.field[start_pos[0]][
             start_pos[1]]
         hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
+
+    def add_hero(self, hero, cords):
+        self.field[cords[0]][cords[1]] = hero
+        hero.rect.x = cords[1] * self.cell_size + self.left
+        hero.rect.y = cords[0] * self.cell_size + self.top
+
 
 def main():
     pygame.init()

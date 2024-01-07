@@ -6,12 +6,14 @@ from hand import Hand
 from startscreen import start_screen
 from field import Field
 from heart import Heart
+from heroes import Axeman
 
 pygame.init()
 size = width, height = 450, 600
 screen = pygame.display.set_mode(size)
 screen.fill('white')
 all_sprites = pygame.sprite.Group()
+clock = pygame.time.Clock()
 
 
 class Game:
@@ -42,6 +44,7 @@ class Game:
         self.field.draw(screen)
         self.store.update(screen)
         self.hand.update()
+        self.field.update(all_sprites)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
             self.field.draw_move_hints(*self.hints_params)
 
@@ -91,7 +94,6 @@ class Game:
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
                     a = [self.hints_params[1][1] - i for i in range(1, self.hints_params[0] + 1)]
                     if res4[1] in a and res4[0] == self.hints_params[1][0]:
-                        print('MOVE!!!')
                         start = self.hints_params[1][1], self.hints_params[1][0]
                         end = res4[1], res4[0]
                         hero = self.field.field[self.hints_params[1][1]][self.hints_params[1][0]]
@@ -106,7 +108,8 @@ class Game:
 running = True
 start_screen()
 game = Game()
-
+axeman = Axeman(all_sprites, 'red')
+game.field.add_hero(axeman, (3, 4))
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -120,5 +123,7 @@ while running:
     all_sprites.draw(screen)
     all_sprites.update()
     pygame.display.flip()
+    clock.tick(60)
 
 pygame.quit()
+print(game.field.field[4][4].hp)

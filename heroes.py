@@ -5,15 +5,16 @@ from load_image import load_image
 class Hero(pygame.sprite.Sprite):
     # image = load_image('knight_back', -1)
 
-    def __init__(self, group, image=load_image('knight_front.png', -1)):
+    def __init__(self, group, color, image=load_image('knight_front.png', -1)):
         super().__init__(group)
         self.name = ''
         self.image = image
         self.rect = self.image.get_rect()
         self.attack_range = None
         self.dist_range = None
-        self.damage = None
-        self.hp = None
+        self.damage = 0
+        self.hp = 0
+        self.color = color
 
     def __str__(self):
         return self.name
@@ -21,11 +22,18 @@ class Hero(pygame.sprite.Sprite):
     def __repr__(self):
         return self.name
 
+    def beat(self, damage):
+        self.hp -= damage
+        self.hp = 0 if self.hp < 0 else self.hp
+
+    def is_alive(self):
+        return bool(self.hp)
+
 
 class Knight(Hero):
 
-    def __init__(self, group, image=load_image('knight_back.png', -1)):
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=load_image('knight_back.png', -1)):
+        super().__init__(group, color, image)
         self.name = 'knight'
         self.damage = 1
         self.attack_range = 1
@@ -34,8 +42,8 @@ class Knight(Hero):
 
 
 class Archer(Hero):
-    def __init__(self, group, image=load_image('archer_back.png')):  # change
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=load_image('archer_back.png')):  # change
+        super().__init__(group, color, image)
         self.name = 'archer'
         self.damage = 1
         self.attack_range = 2
@@ -44,8 +52,8 @@ class Archer(Hero):
 
 
 class Axeman(Hero):
-    def __init__(self, group, image=load_image('axeman_back.png', -1)):
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=load_image('axeman_back.png', -1)):
+        super().__init__(group, color, image)
         self.name = 'axeman'
         self.damage = 2
         self.attack_range = 1
@@ -54,8 +62,8 @@ class Axeman(Hero):
 
 
 class Cavalry(Hero):
-    def __init__(self, group, image=pygame.transform.scale(load_image('cavalry_back.png', -1), (17, 17))):
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=pygame.transform.scale(load_image('cavalry_back.png', -1), (17, 17))):
+        super().__init__(group, color, image)
         self.name = 'cavalry'
         self.damage = 1
         self.attack_range = 1
@@ -64,8 +72,8 @@ class Cavalry(Hero):
 
 
 class Rogue(Hero):
-    def __init__(self, group, image=load_image('rogue_back.png', -1)):
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=load_image('rogue_back.png', -1)):
+        super().__init__(group, color, image)
         self.name = 'rogue'
         self.damage = 1
         self.attack_range = 1
@@ -74,8 +82,8 @@ class Rogue(Hero):
 
 
 class Halberdier(Hero):
-    def __init__(self, group, image=load_image('spearman_back.png', -1)):
-        super().__init__(group, image)
+    def __init__(self, group, color='blue', image=load_image('spearman_back.png', -1)):
+        super().__init__(group, color, image)
         self.name = 'halberdier'
         self.damage = 3
         self.attack_range = 1
