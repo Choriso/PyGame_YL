@@ -6,7 +6,7 @@ from hand import Hand
 from startscreen import start_screen
 from field import Field
 from heart import Heart
-from heroes import Axeman
+from heroes import Axeman, Hero
 
 pygame.init()
 size = width, height = 450, 600
@@ -86,7 +86,7 @@ class Game:
                     self.hand.chosen = None
             if result is False:  # в другом случае или если не поставилась карта
                 hero = self.field.get_piece(res4)
-                if hero:  # если нажали на героя то рисуются подсказки для хода
+                if isinstance(hero, Hero) and hero.color == 'blue':  # если нажали на героя то рисуются подсказки для хода
                     self.field.draw_move_hints(hero.dist_range, res4, screen)
                     self.hints_params = hero.dist_range, res4, screen
                     self.is_showing_move_hints = True
@@ -126,4 +126,3 @@ while running:
     clock.tick(60)
 
 pygame.quit()
-print(game.field.field[4][4].hp)
