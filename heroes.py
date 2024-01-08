@@ -3,8 +3,6 @@ from load_image import load_image
 
 
 class Hero(pygame.sprite.Sprite):
-    # image = load_image('knight_back', -1)
-
     def __init__(self, group, color, image=load_image('knight_front.png', -1)):
         super().__init__(group)
         self.name = ''
@@ -15,6 +13,7 @@ class Hero(pygame.sprite.Sprite):
         self.damage = 0
         self.hp = 0
         self.color = color
+        self.max_hp = self.hp
 
     def __str__(self):
         return self.name
@@ -39,6 +38,7 @@ class Knight(Hero):
         self.attack_range = 1
         self.dist_range = 1
         self.hp = 3
+        self.max_hp = self.hp
 
 
 class Archer(Hero):
@@ -49,6 +49,7 @@ class Archer(Hero):
         self.attack_range = 2
         self.dist_range = 1
         self.hp = 2
+        self.max_hp = self.hp
 
 
 class Axeman(Hero):
@@ -59,6 +60,7 @@ class Axeman(Hero):
         self.attack_range = 1
         self.dist_range = 1
         self.hp = 2
+        self.max_hp = self.hp
 
 
 class Cavalry(Hero):
@@ -69,7 +71,7 @@ class Cavalry(Hero):
         self.attack_range = 1
         self.dist_range = 1
         self.hp = 3
-
+        self.max_hp = self.hp
 
 class Rogue(Hero):
     def __init__(self, group, color='blue', image=load_image('rogue_back.png', -1)):
@@ -79,7 +81,7 @@ class Rogue(Hero):
         self.attack_range = 1
         self.dist_range = 2
         self.hp = 1
-
+        self.max_hp = self.hp
 
 class Halberdier(Hero):
     def __init__(self, group, color='blue', image=load_image('spearman_back.png', -1)):
@@ -89,5 +91,5 @@ class Halberdier(Hero):
         self.attack_range = 1
         self.dist_range = 1
         self.hp = 1
-
+        self.max_hp = self.hp
 

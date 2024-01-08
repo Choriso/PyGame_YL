@@ -23,6 +23,8 @@ class Field:
             pygame.Rect(random.randrange(0, tilemap.get_width(), 16), random.randrange(0, tilemap.get_height(), 16), 16,
                         16)), self.cell_size) for x in range(size[0])] for y in range(size[1])]
         self.field = [[0] * size[0] for i in range(size[1])]
+        self.is_drawing_hp = False
+        self.drawing_hp_params = None
 
     def draw(self, screen):
         # screen.fill(self.bg_color)
@@ -30,6 +32,9 @@ class Field:
             for cell in row:
                 screen.blit(cell.image, cell.rect.move(self.left, self.top))
         self.draw_dashed_line(screen)
+        if self.is_drawing_hp:
+            for i1, j1 in self.drawing_hp_params[3]:
+                self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
 
     def draw_dashed_line(self, screen):
         # Рисуем пунктирные линии
@@ -44,7 +49,7 @@ class Field:
                     pygame.draw.line(screen, (0, 0, 0), (y + self.left, x + self.top),
                                      (y + dash_length + self.left, x + self.top))
 
-    def update(self, group):
+    def update(self, group, screen):
         cords_to_remove = []
         for i in range(self.size[1]):
             for j in range(self.size[0]):
@@ -61,17 +66,33 @@ class Field:
                             if isinstance(piece, Hero) and piece.color != hero.color:
                                 piece.beat(hero.damage)
                                 res = piece.is_alive()
+                                if self.is_drawing_hp:
+                                    self.drawing_hp_params[3].append(
+                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                                else:
+                                    self.is_drawing_hp = True
+                                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
+                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+
+                                for i1, j1 in self.drawing_hp_params[3]:
+                                    self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
 
                                 if not res:
                                     group.remove(piece)
-                                    cords_to_remove.append((i - x, j))
+                                    cords_to_remove.append((i + x, j))
 
                             elif type(piece) is Heart and piece.color != hero.color:
                                 piece.beat(hero.damage)
+                                if self.is_drawing_hp:
+                                    self.drawing_hp_params[3].append(
+                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                                else:
+                                    self.is_drawing_hp = True
+                                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
+                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
 
         for i, j in cords_to_remove:
             self.field[i][j] = 0
-
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -112,6 +133,11 @@ class Field:
         self.field[cords[0]][cords[1]] = hero
         hero.rect.x = cords[1] * self.cell_size + self.left
         hero.rect.y = cords[0] * self.cell_size + self.top
+
+    def draw_hp(self, hp, max_hp, screen, hero_cords):
+        y, x = hero_cords
+        pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
+        pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
 
 
 def main():

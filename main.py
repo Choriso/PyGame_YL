@@ -118,7 +118,9 @@ class Game:
         print('Всё')
 
     def attack_update(self):
-        self.field.update(all_sprites)
+        self.field.is_drawing_hp = False
+        self.field.drawing_hp_params = None
+        self.field.update(all_sprites, screen)
         res = self.game_is_continue()
         if not res:
             winner = self.who_won()
@@ -147,6 +149,6 @@ while running:
     all_sprites.draw(screen)
     all_sprites.update()
     pygame.display.flip()
-    clock.tick(60)
+    clock.tick(6)
 
 pygame.quit()
