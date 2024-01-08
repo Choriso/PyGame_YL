@@ -24,10 +24,15 @@ class Game:
         self.deck = Deck(all_sprites)
         self.store = Store()
         self.hand = Hand()
+
         tilemap = pygame.image.load('data\TexturedGrass.png')
         self.field = Field((21, 30), tilemap, 'white')
-        self.heart = Heart(all_sprites,
-                           (493, self.field.size[0] // 2 * self.field.cell_size + self.field.left))
+
+        self.blue_heart = Heart(all_sprites, 'blue')
+        self.field.add_piece(self.blue_heart, (self.field.size[1] - 1, self.field.size[0] // 2))
+
+        self.red_heart = Heart(all_sprites, 'red')
+        self.field.add_piece(self.red_heart, (0, self.field.size[0] // 2))
 
         # добавляются спрайты и рисуются цены
         self.store.add_sprites(all_sprites)
@@ -76,7 +81,6 @@ class Game:
             # выбирается карта
             self.hand.choose(res3)
         elif res4:
-
             result = False
             if self.hand.chosen:  # если выбрана то поставить на поле
                 result = self.field.on_click(res4, all_sprites, self.hand.chosen)
@@ -85,7 +89,8 @@ class Game:
                     self.hand.chosen = None
             if result is False:  # в другом случае или если не поставилась карта
                 hero = self.field.get_piece(res4)
-                if isinstance(hero, Hero) and hero.color == 'blue':  # если нажали на героя то рисуются подсказки для хода
+                if isinstance(hero,
+                              Hero) and hero.color == 'blue':  # если нажали на героя то рисуются подсказки для хода
                     self.field.draw_move_hints(hero.dist_range, res4, screen)
                     self.hints_params = hero.dist_range, res4, screen
                     self.is_showing_move_hints = True
@@ -101,17 +106,30 @@ class Game:
                     self.hints_params = None
 
     def game_is_continue(self):
-        return self.heart.hp > 0
+        return self.blue_heart.hp > 0 and self.red_heart.hp > 0
+
+    def who_won(self):
+        if self.blue_heart.hp:
+            return 'blue'
+        else:
+            return 'red'
+
+    def game_over(self, winner):
+        print('Всё')
 
     def attack_update(self):
         self.field.update(all_sprites)
+        res = self.game_is_continue()
+        if not res:
+            winner = self.who_won()
+            self.game_over(winner)
 
 
 running = True
 start_screen()
 game = Game()
 axeman = Axeman(all_sprites, 'red')
-game.field.add_hero(axeman, (3, 4))
+game.field.add_piece(axeman, (3, 4))
 ATTACKTIMEEVENT = pygame.USEREVENT + 1
 pygame.time.set_timer(ATTACKTIMEEVENT, 1800)
 while running:
@@ -123,7 +141,6 @@ while running:
             game.action(event.pos)
         elif event.type == ATTACKTIMEEVENT:
             game.attack_update()
-
 
     screen.fill('white')
     game.update()

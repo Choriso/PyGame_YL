@@ -3,6 +3,7 @@ import sys
 import random
 from consts import CLASSES
 from heroes import Hero
+from heart import Heart
 
 
 class Cell:
@@ -44,58 +45,33 @@ class Field:
                                      (y + dash_length + self.left, x + self.top))
 
     def update(self, group):
-        # under_attack = [[0] * self.size[0] for _ in range(self.size[1])]
-        # for i in range(self.size[1]):
-        #     for j in range(self.size[0]):
-        #         if isinstance(self.field[i][j], Hero):
-        #             hero = self.field[i][j]
-        #             under_attack[i][j] = (hero.color, hero.damage)
-        #             if hero.color == 'blue':
-        #                 for x in range(1, hero.attack_range + 1):
-        #                     if i - x >= 0:
-        #                         under_attack[i - x][j] = ('blue', hero.damage)
-        #             else:
-        #                 for x in range(1, hero.attack_range + 1):
-        #                     if i + x < self.size[1]:
-        #                         under_attack[i + x][j] = ('red', hero.damage)
-        # for i in range(self.size[1]):
-        #     for j in range(self.size[0]):
-        #         if under_attack[i][j] and isinstance(self.field[i][j], Hero):
-        #             hero = self.field[i][j]
-        #             if hero.color != under_attack[i][j][0]:
-        #                 print(hero)
-        #                 hero.beat(under_attack[i][j][1])
-        #                 res = hero.is_alive()
-        #                 if not res:
-        #                     group.remove(hero)
-        #                     self.field[i][j] = 0
-        #                     # еще можно дать вознаграждение за это
         cords_to_remove = []
         for i in range(self.size[1]):
             for j in range(self.size[0]):
+
                 if isinstance(self.field[i][j], Hero):
                     hero = self.field[i][j]
-                    if hero.color == 'blue':
-                        for x in range(hero.attack_range + 1):
-                            if i - x >= 0 and isinstance(self.field[i - x][j], Hero) and self.field[i - x][j].color != 'blue':
-                                hero2 = self.field[i - x][j]
-                                hero2.beat(hero.damage)
-                                res = hero2.is_alive()
+
+                    for x in range(hero.attack_range + 1):
+                        x = -x if hero.color == 'blue' else x
+
+                        if self.size[1] > i + x >= 0:
+                            piece = self.field[i + x][j]
+
+                            if isinstance(piece, Hero) and piece.color != hero.color:
+                                piece.beat(hero.damage)
+                                res = piece.is_alive()
+
                                 if not res:
-                                    group.remove(hero2)
+                                    group.remove(piece)
                                     cords_to_remove.append((i - x, j))
-                    else:
-                        for x in range(hero.attack_range + 1):
-                            if i + x < self.size[1] and isinstance(self.field[i + x][j], Hero) and self.field[i + x][j].color != 'red':
-                                hero2 = self.field[i + x][j]
-                                hero2.beat(hero.damage)
-                                res = hero2.is_alive()
-                                if not res:
-                                    group.remove(hero2)
-                                    cords_to_remove.append((i - x, j))
+
+                            elif type(piece) is Heart and piece.color != hero.color:
+                                piece.beat(hero.damage)
+
         for i, j in cords_to_remove:
             self.field[i][j] = 0
-        # self.field = deepcopy(fieldcopy)
+
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -132,7 +108,7 @@ class Field:
                 start_pos[1]]
             hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
 
-    def add_hero(self, hero, cords):
+    def add_piece(self, hero, cords):
         self.field[cords[0]][cords[1]] = hero
         hero.rect.x = cords[1] * self.cell_size + self.left
         hero.rect.y = cords[0] * self.cell_size + self.top

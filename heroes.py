@@ -24,7 +24,7 @@ class Hero(pygame.sprite.Sprite):
 
     def beat(self, damage):
         self.hp -= damage
-        self.hp = 0 if self.hp < 0 else self.hp
+        self.hp = max(0, self.hp)
 
     def is_alive(self):
         return bool(self.hp)
