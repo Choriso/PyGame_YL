@@ -35,7 +35,7 @@ class Knight(Hero):
     def __init__(self, group, color='blue', image=load_image('knight_back.png', -1)):
         super().__init__(group, color, image)
         self.name = 'knight'
-        self.damage = 5
+        self.damage = 1
         self.attack_range = 1
         self.dist_range = 1
         self.hp = 3

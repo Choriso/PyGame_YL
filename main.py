@@ -44,7 +44,6 @@ class Game:
         self.field.draw(screen)
         self.store.update(screen)
         self.hand.update()
-        self.field.update(all_sprites)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
             self.field.draw_move_hints(*self.hints_params)
 
@@ -104,19 +103,27 @@ class Game:
     def game_is_continue(self):
         return self.heart.hp > 0
 
+    def attack_update(self):
+        self.field.update(all_sprites)
+
 
 running = True
 start_screen()
 game = Game()
 axeman = Axeman(all_sprites, 'red')
 game.field.add_hero(axeman, (3, 4))
+ATTACKTIMEEVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(ATTACKTIMEEVENT, 1800)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+        elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             game.action(event.pos)
+        elif event.type == ATTACKTIMEEVENT:
+            game.attack_update()
+
 
     screen.fill('white')
     game.update()
