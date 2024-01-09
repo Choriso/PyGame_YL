@@ -1,5 +1,5 @@
 import pygame
-from load_image import load_image
+from consts import load_image
 
 
 class Heart(pygame.sprite.Sprite):

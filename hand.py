@@ -9,18 +9,21 @@ screen.fill('white')
 
 class Hand:
     def __init__(self):
-        self.hand = []
+        self.blue_hand = []
+        self.red_hand = []
         self.card_cnt = 0
         self.chosen = None
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
+        self.current_color = 'blue'
 
-    def update(self):
-
+    def update(self, screen):
+        # print(self.card_cnt, len(self.blue_hand))
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
         x = 2
         visited = []
         not_visited = {}
         pos = {}
-        for card in self.hand:
+        for card in hand:
             if card.name not in visited:
                 card.rect.x = x
                 card.rect.y = 520
@@ -46,27 +49,40 @@ class Hand:
             screen.blit(text, (x + 20, 518))
 
     def add_card(self, card):
-        self.hand.append(card)
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand.append(card)
         self.card_cnt += 1
-        self.update()
         return True
 
-    def add_sprites(self, group):
-        for card in self.hand:
-            group.add(card)
-
     def can_add(self):
-        return self.card_cnt <= 9
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        return len(hand) <= 9
 
     def is_concerning(self, pos):
-        for i in range(len(self.hand)):
-            if self.hand[i].rect.collidepoint(*pos):
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        for i in range(len(hand)):
+            if hand[i].rect.collidepoint(*pos):
                 return i
         return False
 
     def choose(self, ind):
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
         if self.chosen:
-            self.hand.append(self.chosen)
-        self.chosen = self.hand.pop(ind)
+            hand.append(self.chosen)
+        self.chosen = hand.pop(ind)
         self.card_cnt -= 1
 
+    def add_sprites(self, group):
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        for card in hand:
+            group.add(card)
+
+    def remove_sprites(self, group):
+        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        for card in hand:
+            group.remove(card)
+
+    def swap_hands(self, group):
+        self.remove_sprites(group)
+        self.current_color = 'blue' if self.current_color == 'red' else 'red'
+        self.add_sprites(group)

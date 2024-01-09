@@ -1,5 +1,5 @@
 import pygame
-from load_image import load_image
+from consts import load_image
 
 pygame.init()
 size = width, height = 450, 600
@@ -17,19 +17,22 @@ class GoldCoin(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 400
         self.rect.y = 550
-        self.gold = 5
-        self.gold_to_pos = {1: (419, 564), 2: (412, 564)}
+        self.blue_gold = 5
+        self.red_gold = 4
+        self.gold_to_pos = {1: (419, 564), 2: (412, 564)} # change
 
-    def update(self):
+    def update(self, color, screen):
+        gold = self.blue_gold if color == 'blue' else self.red_gold
         font = pygame.font.SysFont('default', 32, italic=False, bold=False)
-        text = font.render(f'{self.gold}', 1, "#895404")
-        pos = self.gold_to_pos[len(str(self.gold))]
+        text = font.render(f'{gold}', 1, "#895404")
+        pos = self.gold_to_pos[len(str(gold))]
         screen.blit(text, pos)
 
-    def buy(self, price):
-        if self.gold >= price:
-            self.gold -= price
-            self.gold = max(self.gold, 0)
+    def buy(self, price, color):
+        gold = self.blue_gold if color == 'blue' else self.red_gold
+        if gold >= price:
+            gold -= price
+            gold = max(gold, 0)
             return True
         return False
 

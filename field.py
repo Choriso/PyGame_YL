@@ -1,7 +1,8 @@
 import pygame
 import sys
 import random
-from consts import CLASSES
+
+from CLASSES import CLASSES
 from heroes import Hero
 from heart import Heart
 
@@ -132,12 +133,13 @@ class Field:
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
 
-    def draw_move_hints(self, dist_range, cords, screen):
+    def draw_move_hints(self, dist_range, cords, screen, color):
         for i in range(1, dist_range + 1):
+            i = -i if color == 'red' else i
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
                 (self.cell_size, self.cell_size)), 2)
-            if i == 1:
+            if abs(i) == 1:
                 for j in (-1, 1):
                     pygame.draw.rect(screen, 'cyan', (
                         ((cords[0] + j) * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
@@ -163,6 +165,22 @@ class Field:
         else:
             pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
             pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
+
+    def flip(self):
+        self.field = self.field[::-1]
+        self.cells = self.cells[::-1]
+
+        self.is_drawing_hp = False
+        self.drawing_hp_params = None
+
+        for i in range(self.size[1]):
+            for j in range(self.size[0]):
+                if self.field[i][j]:
+                    piece = self.field[i][j]
+                    piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                    if isinstance(piece, Hero):
+                        piece.change_state_and_image()
+
 
 
 def main():

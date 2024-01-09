@@ -1,7 +1,7 @@
 import pygame
 from random import choice
-from consts import IMAGES, CLASSES
-from load_image import load_image
+from consts import CARD_IMAGES, load_image
+from CLASSES import CLASSES
 
 pygame.init()
 size = width, height = 450, 600
@@ -16,7 +16,7 @@ class Card(pygame.sprite.Sprite):
     def __init__(self, group, link):
         super().__init__(group)
         self.name = link
-        self.image = pygame.transform.scale(load_image(IMAGES[link]), (30, 40))
+        self.image = pygame.transform.scale(load_image(CARD_IMAGES[link]), (30, 40))
         self.rect = self.image.get_rect()
         self.link = CLASSES[link]
 
@@ -27,7 +27,7 @@ class Deck(pygame.sprite.Sprite):
     def __init__(self, group, cur_card='knight'):
         super().__init__(group)
         self.group = group
-        self.image = load_image(Deck.image)
+        self.image = load_image(Deck.image, -1)
         self.rect = self.image.get_rect()
         self.cur_card = Card(all_sprites, cur_card)
         self.cur_card.rect.x = 410

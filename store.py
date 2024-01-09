@@ -1,7 +1,8 @@
 import pygame
 from card_cl import Card
 from random import choice
-from consts import CLASSES, PRICES
+from consts import PRICES
+from CLASSES import CLASSES
 
 pygame.init()
 size = width, height = 450, 600
