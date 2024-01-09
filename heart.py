@@ -9,7 +9,6 @@ class Heart(pygame.sprite.Sprite):
         super().__init__(group)
         self.rect = self.image.get_rect()
         self.hp = 50
-        # self.rect.y, self.rect.x = pos
         self.color = color
         self.max_hp = self.hp
 

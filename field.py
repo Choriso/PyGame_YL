@@ -50,8 +50,44 @@ class Field:
                                      (y + dash_length + self.left, x + self.top))
 
     def update(self, group, screen):
+        def fight(i, j, hero, piece):
+            f = False
+            if isinstance(piece, Hero) and piece.color != hero.color:
+                piece.beat(hero.damage)
+                f = True
+                res = piece.is_alive()
+                if self.is_drawing_hp:
+                    self.drawing_hp_params[3].append(
+                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                else:
+                    self.is_drawing_hp = True
+                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
+                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+
+                for i1, j1 in self.drawing_hp_params[3]:
+                    self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+
+                if not res:
+                    group.remove(piece)
+                    cords_to_remove.append((i + x, j))
+
+            elif type(piece) is Heart and piece.color != hero.color:
+                piece.beat(hero.damage)
+                f = True
+                if self.is_drawing_hp:
+                    self.drawing_hp_params[3].append(
+                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                else:
+                    self.is_drawing_hp = True
+                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
+                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+
+            return f
+
         cords_to_remove = []
+
         for i in range(self.size[1]):
+
             for j in range(self.size[0]):
 
                 if isinstance(self.field[i][j], Hero):
@@ -63,33 +99,12 @@ class Field:
                         if self.size[1] > i + x >= 0:
                             piece = self.field[i + x][j]
 
-                            if isinstance(piece, Hero) and piece.color != hero.color:
-                                piece.beat(hero.damage)
-                                res = piece.is_alive()
-                                if self.is_drawing_hp:
-                                    self.drawing_hp_params[3].append(
-                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
-                                else:
-                                    self.is_drawing_hp = True
-                                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
-
-                                for i1, j1 in self.drawing_hp_params[3]:
-                                    self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
-
-                                if not res:
-                                    group.remove(piece)
-                                    cords_to_remove.append((i + x, j))
-
-                            elif type(piece) is Heart and piece.color != hero.color:
-                                piece.beat(hero.damage)
-                                if self.is_drawing_hp:
-                                    self.drawing_hp_params[3].append(
-                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
-                                else:
-                                    self.is_drawing_hp = True
-                                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+                            had_beaten = fight(i, j, hero, piece)
+                            if abs(x) in (0, 1) and not had_beaten:
+                                for a in range(-1, 2):
+                                    if self.size[0] > j + a >= 0:
+                                        piece = self.field[i + x][j + a]
+                                        fight(i, j + a, hero, piece)
 
         for i, j in cords_to_remove:
             self.field[i][j] = 0
@@ -122,12 +137,18 @@ class Field:
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
                 (self.cell_size, self.cell_size)), 2)
+            if i == 1:
+                for j in (-1, 1):
+                    pygame.draw.rect(screen, 'cyan', (
+                        ((cords[0] + j) * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
+                        (self.cell_size, self.cell_size)), 2)
 
     def move_hero(self, start_pos, end_pos, hero):
         if not self.field[end_pos[0]][end_pos[1]]:
             self.field[start_pos[0]][start_pos[1]], self.field[end_pos[0]][end_pos[1]] = 0, self.field[start_pos[0]][
                 start_pos[1]]
             hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
+            hero.rect.x -= (start_pos[1] - end_pos[1]) * self.cell_size
 
     def add_piece(self, hero, cords):
         self.field[cords[0]][cords[1]] = hero
@@ -136,8 +157,12 @@ class Field:
 
     def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords
-        pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
-        pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
+        if y - 5 < 0:
+            pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
+            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp), 4)))
+        else:
+            pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
+            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
 
 
 def main():

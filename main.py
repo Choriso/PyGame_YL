@@ -91,13 +91,13 @@ class Game:
                 hero = self.field.get_piece(res4)
                 if isinstance(hero,
                               Hero) and hero.color == 'blue':  # если нажали на героя то рисуются подсказки для хода
-                    self.field.draw_move_hints(hero.dist_range, res4, screen)
                     self.hints_params = hero.dist_range, res4, screen
+                    self.field.draw_move_hints(*self.hints_params)
                     self.is_showing_move_hints = True
 
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
                     a = [self.hints_params[1][1] - i for i in range(1, self.hints_params[0] + 1)]
-                    if res4[1] in a and res4[0] == self.hints_params[1][0]:
+                    if res4[1] in a and res4[0] in [self.hints_params[1][0] + i for i in (-1, 0, 1)]:
                         start = self.hints_params[1][1], self.hints_params[1][0]
                         end = res4[1], res4[0]
                         hero = self.field.field[self.hints_params[1][1]][self.hints_params[1][0]]
@@ -130,10 +130,13 @@ class Game:
 running = True
 start_screen()
 game = Game()
+
 axeman = Axeman(all_sprites, 'red')
 game.field.add_piece(axeman, (3, 4))
-ATTACKTIMEEVENT = pygame.USEREVENT + 1
-pygame.time.set_timer(ATTACKTIMEEVENT, 1800)
+
+ATTACKEVENT = pygame.USEREVENT + 1
+pygame.time.set_timer(ATTACKEVENT, 1800)
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -141,7 +144,7 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             game.action(event.pos)
-        elif event.type == ATTACKTIMEEVENT:
+        elif event.type == ATTACKEVENT:
             game.attack_update()
 
     screen.fill('white')
