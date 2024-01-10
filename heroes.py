@@ -1,32 +1,71 @@
 import pygame
-from load_image import load_image
+from consts import HERO_IMAGES
 
 
-class Hero(pygame.sprite.Sprite):
-    # image = load_image('knight_back', -1)
-
-    def __init__(self, group, image=load_image('knight_front.png', -1)):
+class Piece(pygame.sprite.Sprite):
+    def __init__(self, group, color, hp, name='piece'):
         super().__init__(group)
-        self.image = image
+        self.name = name
+        self.state = 'front'
+        self.image = HERO_IMAGES[color][name][self.state]
         self.rect = self.image.get_rect()
-        self.attack_range = None
-        self.dist_range = None
-        self.damage = None
-        self.hp = None
-
-
-class Knight(Hero):
-
-    def __init__(self, group, image=load_image('knight_back.png', -1)):
-        super().__init__(group, image)
-        self.name = 'knight'
-        self.damage = 1
-        self.attack_range = 1
-        self.dist_range = 2
-        self.hp = 3
+        self.hp = hp
+        self.color = color
+        self.max_hp = self.hp
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
         return self.name
+
+    def beat(self, damage):
+        self.hp -= damage
+        self.hp = max(0, self.hp)
+
+    def is_alive(self):
+        return bool(self.hp)
+
+
+class Hero(Piece):
+    def __init__(self, group, color, attack_range, dist_range, damage, hp, name='hero'):
+        super().__init__(group, color, hp, name)
+        self.change_state_and_image()
+        self.attack_range = attack_range
+        self.dist_range = dist_range
+        self.damage = damage
+
+    def change_state_and_image(self):
+        self.state = 'back' if self.state == 'front' else 'front'
+        self.image = HERO_IMAGES[self.color][self.name][self.state]
+
+
+class Knight(Hero):
+
+    def __init__(self, group, color='blue'):
+        super().__init__(group, color, 1, 1, 1, 3, 'knight')
+
+
+class Archer(Hero):
+    def __init__(self, group, color='blue'):  # change
+        super().__init__(group, color, 2, 1, 1, 2, 'archer')
+
+
+class Axeman(Hero):
+    def __init__(self, group, color='blue'):
+        super().__init__(group, color, 1, 1, 2, 2, 'axeman')
+
+
+class Cavalry(Hero):
+    def __init__(self, group, color='blue'):
+        super().__init__(group, color, 1, 1, 1, 3, 'cavalry')
+
+
+class Rogue(Hero):
+    def __init__(self, group, color='blue'):
+        super().__init__(group, color, 1, 2, 1, 1, 'rogue')
+
+
+class Halberdier(Hero):
+    def __init__(self, group, color='blue'):
+        super().__init__(group, color, 1, 1, 3, 1, 'halberdier')
