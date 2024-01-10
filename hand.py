@@ -1,5 +1,4 @@
 import pygame
-from card_cl import Card
 
 pygame.init()
 size = width, height = 450, 600
@@ -17,7 +16,6 @@ class Hand:
         self.current_color = 'blue'
 
     def update(self, surface):
-        # print(self.card_cnt, len(self.blue_hand))
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
         x = 2
         visited = []

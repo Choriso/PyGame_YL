@@ -50,12 +50,7 @@ class Deck(pygame.sprite.Sprite):
 
 
 def main():
-    deck = Deck(all_sprites)
     running = True
-    card1 = Card(all_sprites, 'knight')
-    card2 = Card(all_sprites, 'knight')
-    if card1 == card2:
-        print(111)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

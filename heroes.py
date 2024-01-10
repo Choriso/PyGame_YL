@@ -1,18 +1,14 @@
 import pygame
-from consts import load_image
 from consts import HERO_IMAGES
 
 
-class Hero(pygame.sprite.Sprite):
-    def __init__(self, group, color, attack_range, dist_range, damage, hp, name='hero'):
+class Piece(pygame.sprite.Sprite):
+    def __init__(self, group, color, hp, name='piece'):
         super().__init__(group)
         self.name = name
-        self.state = 'back'
+        self.state = 'front'
         self.image = HERO_IMAGES[color][name][self.state]
         self.rect = self.image.get_rect()
-        self.attack_range = attack_range
-        self.dist_range = dist_range
-        self.damage = damage
         self.hp = hp
         self.color = color
         self.max_hp = self.hp
@@ -29,6 +25,15 @@ class Hero(pygame.sprite.Sprite):
 
     def is_alive(self):
         return bool(self.hp)
+
+
+class Hero(Piece):
+    def __init__(self, group, color, attack_range, dist_range, damage, hp, name='hero'):
+        super().__init__(group, color, hp, name)
+        self.change_state_and_image()
+        self.attack_range = attack_range
+        self.dist_range = dist_range
+        self.damage = damage
 
     def change_state_and_image(self):
         self.state = 'back' if self.state == 'front' else 'front'

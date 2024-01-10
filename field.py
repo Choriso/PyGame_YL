@@ -3,7 +3,7 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from heroes import Hero
+from heroes import Hero, Piece
 from heart import Heart
 
 
@@ -53,7 +53,7 @@ class Field:
     def update(self, group, screen):
         def fight(i, j, hero, piece):
             f = False
-            if isinstance(piece, Hero) and piece.color != hero.color:
+            if isinstance(piece, Piece) and piece.color != hero.color:
                 piece.beat(hero.damage)
                 f = True
                 res = piece.is_alive()

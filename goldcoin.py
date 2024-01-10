@@ -19,14 +19,14 @@ class GoldCoin(pygame.sprite.Sprite):
         self.rect.y = 550
         self.blue_gold = 5
         self.red_gold = 4
-        self.gold_to_pos = {1: (419, 564), 2: (412, 564)} # change
+        self.gold_to_pos = {1: (419, 564), 2: (412, 564)}  # change
 
-    def update(self, color, screen):
+    def update(self, color, surface):
         gold = self.blue_gold if color == 'blue' else self.red_gold
         font = pygame.font.SysFont('default', 32, italic=False, bold=False)
         text = font.render(f'{gold}', 1, "#895404")
         pos = self.gold_to_pos[len(str(gold))]
-        screen.blit(text, pos)
+        surface.blit(text, pos)
 
     def buy(self, price, color):
         gold = self.blue_gold if color == 'blue' else self.red_gold
@@ -43,7 +43,6 @@ class GoldCoin(pygame.sprite.Sprite):
 
 def main():
     running = True
-    coin = GoldCoin(all_sprites)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
