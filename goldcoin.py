@@ -33,6 +33,10 @@ class GoldCoin(pygame.sprite.Sprite):
         if gold >= price:
             gold -= price
             gold = max(gold, 0)
+            if color == 'blue':
+                self.blue_gold = gold
+            else:
+                self.red_gold = gold
             return True
         return False
 

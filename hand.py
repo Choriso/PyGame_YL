@@ -16,7 +16,7 @@ class Hand:
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
         self.current_color = 'blue'
 
-    def update(self, screen):
+    def update(self, surface):
         # print(self.card_cnt, len(self.blue_hand))
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
         x = 2
@@ -46,7 +46,7 @@ class Hand:
         font = pygame.font.SysFont('default', 30, italic=False, bold=False)
         for cnt, x in not_visited.values():
             text = font.render(f'X{cnt}', 1, "black")
-            screen.blit(text, (x + 20, 518))
+            surface.blit(text, (x + 20, 518))
 
     def add_card(self, card):
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand

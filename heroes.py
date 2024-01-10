@@ -7,7 +7,7 @@ class Hero(pygame.sprite.Sprite):
     def __init__(self, group, color, attack_range, dist_range, damage, hp, name='hero'):
         super().__init__(group)
         self.name = name
-        self.state = 'back' if color == 'blue' else 'front'
+        self.state = 'back'
         self.image = HERO_IMAGES[color][name][self.state]
         self.rect = self.image.get_rect()
         self.attack_range = attack_range

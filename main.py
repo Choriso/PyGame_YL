@@ -97,7 +97,7 @@ class Game:
         elif res4:
             result = False
             if self.hand.chosen:  # если выбрана то поставить на поле
-                result = self.field.on_click(res4, all_sprites, self.hand.chosen)
+                result = self.field.on_click(res4, all_sprites, self.hand.chosen, self.current_color)
                 if result:
                     all_sprites.remove(self.hand.chosen)
                     self.hand.chosen = None
@@ -110,10 +110,8 @@ class Game:
                     self.is_showing_move_hints = True
 
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
-                    if self.field.field[self.hints_params[1][1]][self.hints_params[1][0]].color == 'blue':
-                        a = [self.hints_params[1][1] - i for i in range(1, self.hints_params[0] + 1)]
-                    else:
-                        a = [self.hints_params[1][1] + i for i in range(1, self.hints_params[0] + 1)]
+                    a = [self.hints_params[1][1] + i for i in range(-self.hints_params[0], self.hints_params[0] + 1) if
+                         i != 0]
                     if res4[1] in a and res4[0] in [self.hints_params[1][0] + i for i in (-1, 0, 1)]:
                         start = self.hints_params[1][1], self.hints_params[1][0]
                         end = res4[1], res4[0]
@@ -121,7 +119,7 @@ class Game:
                         self.field.move_hero(start, end, hero)
                     self.is_showing_move_hints = False
                     self.hints_params = None
-        elif res5:
+        elif res5 and not self.hand.chosen:
             if self.pushed_turn_button_first_time:
                 self.flip_board()
                 self.pushed_turn_button_first_time = False
@@ -167,6 +165,7 @@ start_screen()
 game = Game()
 
 axeman = Axeman(all_sprites, 'red')
+axeman.change_state_and_image()
 game.field.add_piece(axeman, (3, 4))
 
 ATTACKEVENT = pygame.USEREVENT + 1

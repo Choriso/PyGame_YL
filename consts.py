@@ -3,8 +3,13 @@ import sys
 import pygame
 
 pygame.init()
-size = widht, height = 450, 600
+size = width, height = 450, 600
 screen = pygame.display.set_mode(size)
+
+
+# pygame.init()
+# size = width, height = 450, 600
+# screen = pygame.display.set_mode(size)
 
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -67,19 +72,19 @@ HERO_IMAGES = {
             'back': load_image('archer_back.png', -1)
         },
         'axeman': {
-            'front': '',
+            'front': load_image('axeman_front.png', -1),
             'back': load_image('axeman_back.png', -1)
         },
         'halberdier': {
-            'front': '',
+            'front': load_image('halberdier_front.png', -1),
             'back': load_image('halberdier_back.png', -1)
         },
         'cavalry': {
-            'front': '',
-            'back': load_image('cavalry_back.png', -1)
+            'front': pygame.transform.scale(load_image('cavalry_front.png', -1), (17, 17)),
+            'back': pygame.transform.scale(load_image('cavalry_back.png', -1), (17, 17))
         },
         'rogue': {
-            'front': '',
+            'front': load_image('rogue_front.png', -1),
             'back': load_image('rogue_back.png', -1)
         },
         'fence': {
@@ -117,28 +122,28 @@ HERO_IMAGES = {
     },
     'red': {
         'knight': {
-            'front': '',
-            'back': ''
+            'front': load_image('knight_front.png', -1),
+            'back': load_image('knight_red_back.png', -1)
         },
         'archer': {
-            'front': '',
-            'back': ''
+            'front': load_image('archer_red_front.png', -1),
+            'back': load_image('archer_red_back.png', -1)
         },
         'axeman': {
             'front': load_image('axeman_red_front.png', -1),
             'back': load_image('axeman_red_back.png', -1)
         },
         'halberdier': {
-            'front': '',
-            'back': ''
+            'front': load_image('halberdier_red_front.png', -1),
+            'back': load_image('halberdier_red_back.png', -1)
         },
         'cavalry': {
-            'front': '',
-            'back': ''
+            'front': pygame.transform.scale(load_image('cavalry_red_front.png', -1), (17, 17)),
+            'back': pygame.transform.scale(load_image('cavalry_red_back.png', -1), (17, 17))
         },
         'rogue': {
-            'front': '',
-            'back': ''
+            'front': load_image('rogue_red_front.png', -1),
+            'back': load_image('rogue_red_back.png', -1)
         },
         'fence': {
             'front': '',
@@ -174,4 +179,3 @@ HERO_IMAGES = {
         }
     }
 }
-

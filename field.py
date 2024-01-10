@@ -121,10 +121,10 @@ class Field:
             return None
         return cell_x, cell_y
 
-    def on_click(self, cell_coords, group, card):
+    def on_click(self, cell_coords, group, card, color):
         if self.field[cell_coords[1]][cell_coords[0]]:
             return False
-        hero = card.link(group)
+        hero = card.link(group, color=color)
         self.field[cell_coords[1]][cell_coords[0]] = hero
         hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
         hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
@@ -134,8 +134,7 @@ class Field:
         return self.field[cords[1]][cords[0]]
 
     def draw_move_hints(self, dist_range, cords, screen, color):
-        for i in range(1, dist_range + 1):
-            i = -i if color == 'red' else i
+        for i in range(-dist_range, dist_range + 1):
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
                 (self.cell_size, self.cell_size)), 2)
