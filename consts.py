@@ -118,7 +118,8 @@ HERO_IMAGES = {
         'bomb': {
             'front': '',
             'back': ''
-        }
+        },
+        'heart': load_image('Heart_blue.png', -1)
     },
     'red': {
         'knight': {
@@ -176,6 +177,7 @@ HERO_IMAGES = {
         'bomb': {
             'front': '',
             'back': ''
-        }
+        },
+        'heart': load_image('Heart_red.png', -1)
     }
 }
