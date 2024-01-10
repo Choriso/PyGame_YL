@@ -14,6 +14,7 @@ screen = pygame.display.set_mode(size)
 screen.fill('white')
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
+pygame.display.set_caption('Stratego')
 
 
 class Game:
@@ -143,7 +144,7 @@ class Game:
     def attack_update(self):
         self.field.is_drawing_hp = False
         self.field.drawing_hp_params = None
-        self.field.update(all_sprites, screen)
+        self.field.update(all_sprites, screen, self.current_color)
         res = self.game_is_continue()
         if not res:
             winner = self.who_won()

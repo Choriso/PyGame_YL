@@ -6,7 +6,7 @@ class Piece(pygame.sprite.Sprite):
     def __init__(self, group, color, hp, name='piece'):
         super().__init__(group)
         self.name = name
-        self.state = 'front'
+        self.state = 'back'
         self.image = HERO_IMAGES[color][name][self.state]
         self.rect = self.image.get_rect()
         self.hp = hp
@@ -26,18 +26,17 @@ class Piece(pygame.sprite.Sprite):
     def is_alive(self):
         return bool(self.hp)
 
+    def change_state_and_image(self):
+        self.state = 'back' if self.state == 'front' else 'front'
+        self.image = HERO_IMAGES[self.color][self.name][self.state]
+
 
 class Hero(Piece):
     def __init__(self, group, color, attack_range, dist_range, damage, hp, name='hero'):
         super().__init__(group, color, hp, name)
-        self.change_state_and_image()
         self.attack_range = attack_range
         self.dist_range = dist_range
         self.damage = damage
-
-    def change_state_and_image(self):
-        self.state = 'back' if self.state == 'front' else 'front'
-        self.image = HERO_IMAGES[self.color][self.name][self.state]
 
 
 class Knight(Hero):
@@ -69,3 +68,30 @@ class Rogue(Hero):
 class Halberdier(Hero):
     def __init__(self, group, color='blue'):
         super().__init__(group, color, 1, 1, 3, 1, 'halberdier')
+
+
+class Building(Piece):
+    def __init__(self, group, color, hp, name):
+        super().__init__(group, color, hp, name)
+
+
+class Fence(Building):
+    def __init__(self, group, color, name='fence'):
+        super().__init__(group, color, 4, name)
+
+
+class StoneFence(Fence):
+    def __init__(self, group, color):
+        super().__init__(group, color, 'stone fence')
+
+
+class Shield(Building):
+    def __init__(self, group, color):
+        super().__init__(group, color, 6, 'shield')
+
+
+class Ballista(Building):
+    def __init__(self, group, color):
+        super().__init__(group, color, 4, 'ballista')
+        self.attack_range = 2
+        self.damage = 1

@@ -3,7 +3,7 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from heroes import Hero, Piece
+from heroes import Hero, Piece, Ballista
 from heart import Heart
 
 
@@ -50,7 +50,7 @@ class Field:
                     pygame.draw.line(screen, (0, 0, 0), (y + self.left, x + self.top),
                                      (y + dash_length + self.left, x + self.top))
 
-    def update(self, group, screen):
+    def update(self, group, screen, current_color):
         def fight(i, j, hero, piece):
             f = False
             if isinstance(piece, Piece) and piece.color != hero.color:
@@ -91,11 +91,11 @@ class Field:
 
             for j in range(self.size[0]):
 
-                if isinstance(self.field[i][j], Hero):
+                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista):
                     hero = self.field[i][j]
 
                     for x in range(hero.attack_range + 1):
-                        x = -x if hero.color == 'blue' else x
+                        x = -x if hero.color == current_color else x
 
                         if self.size[1] > i + x >= 0:
                             piece = self.field[i + x][j]
@@ -177,25 +177,18 @@ class Field:
                 if self.field[i][j]:
                     piece = self.field[i][j]
                     piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
-                    if isinstance(piece, Hero):
+                    if isinstance(piece, Piece):
                         piece.change_state_and_image()
-
 
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((800, 600))
-    tilemap = pygame.image.load('data\TexturedGrass.png')  # Загрузите ваш tilemap здесь
-    interface = Interface(screen, tilemap, 100)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                interface.click(event.pos)
-
-        interface.draw()
         pygame.display.flip()
 
 

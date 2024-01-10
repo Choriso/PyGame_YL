@@ -34,6 +34,7 @@ CARD_IMAGES = {
     'halberdier': "Алебардист.png",
     'cavalry': 'Конница.png',
     'rogue': 'Проныра.png',
+    'ballista': 'Баллиста.png',
     'fence': "",
     'wall': "",
     'thorn': ...,
@@ -51,7 +52,9 @@ PRICES = {
     'halberdier': 2,
     'cavalry': 2,
     'rogue': 2,
-    'fence': ...,
+    'ballista': 3,
+    'fence': 1,
+    'stone fence': 2,
     'wall': ...,
     'thorn': ...,
     'canon': ...,
@@ -88,36 +91,37 @@ HERO_IMAGES = {
             'back': load_image('rogue_back.png', -1)
         },
         'fence': {
-            'front': '',
-            'back': ''
+            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), False, True),
+            'back': load_image('Wooden_fence.png', -1)
+        },
+        'stone fence': {
+            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), False, True),
+            'back': load_image('Stone_fence.png', -1)
+        },
+        'ballista': {
+            'front': pygame.transform.flip(load_image('ballista_blue.png', -1), False, True),
+            'back': load_image('ballista_blue.png', -1)
         },
         'wall': {
             'front': '',
-            'back': ''
         },
         'thorn': {
             'front': '',
-            'back': ''
         },
         'canon': {
             'front': '',
-            'back': ''
         },
         'catapult': {
             'front': '',
-            'back': ''
         },
         'gold mine': {
             'front': '',
-            'back': ''
         },
         'freeze': {
             'front': '',
-            'back': ''
         },
         'bomb': {
             'front': '',
-            'back': ''
         },
         'heart': load_image('Heart_blue.png', -1)
     },
@@ -147,8 +151,16 @@ HERO_IMAGES = {
             'back': load_image('rogue_red_back.png', -1)
         },
         'fence': {
-            'front': '',
-            'back': ''
+            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), False, True),
+            'back': load_image('Wooden_fence.png', -1)
+        },
+        'stone fence': {
+            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), False, True),
+            'back': load_image('Stone_fence.png', -1)
+        },
+        'ballista': {
+            'front': pygame.transform.flip(load_image('ballista_red.png', -1), False, True),
+            'back': load_image('ballista_red.png', -1)
         },
         'wall': {
             'front': '',
