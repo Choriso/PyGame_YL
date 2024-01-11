@@ -41,8 +41,8 @@ CARD_IMAGES = {
     'canon': ...,
     'catapult': ...,
     'gold mine': ...,
-    'freeze': ...,
-    'bomb': 'question.png',
+    'freeze': 'question.png',
+    'bomb': ...,
 }
 
 PRICES = {
@@ -60,8 +60,8 @@ PRICES = {
     'canon': ...,
     'catapult': ...,
     'gold mine': ...,
-    'freeze': ...,
-    'bomb': 1,
+    'freeze': 1,
+    'bomb': ...,
 }
 
 HERO_IMAGES = {
@@ -191,5 +191,7 @@ HERO_IMAGES = {
             'back': ''
         },
         'heart': load_image('Heart_red.png', -1)
-    }
+    },
+    'bomb': load_image('Bomb/bomb1.png', -1),
+    'freeze': pygame.transform.scale(load_image('snowflake.png', -1), (17, 17))
 }

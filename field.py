@@ -3,7 +3,7 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from heroes import Hero, Piece, Ballista, Bomb
+from heroes import Hero, Piece, Ballista, Bomb, Freeze
 from heart import Heart
 
 
@@ -107,7 +107,6 @@ class Field:
                                         piece = self.field[i + x][j + a]
                                         fight(i, j + a, hero, piece)
                 elif isinstance(self.field[i][j], Bomb) and self.field[i][j].ready:
-                    print(1)
                     bomb = self.field[i][j]
                     for y in (-1, 0, 1):
                         for x in (-1, 0, 1):
@@ -115,8 +114,9 @@ class Field:
                                 fight(i + y, j + x, bomb, self.field[i + y][j + x])
                     group.remove(bomb)
                     cords_to_remove.append((i, j))
-
-
+                elif isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and not self.field[i][j][0].is_active:
+                    freeze, self.field[i][j] = self.field[i][j]
+                    group.remove(freeze)
 
         for i, j in cords_to_remove:
             self.field[i][j] = 0
@@ -163,7 +163,10 @@ class Field:
             hero.rect.x -= (start_pos[1] - end_pos[1]) * self.cell_size
 
     def add_piece(self, hero, field_cords):
-        self.field[field_cords[0]][field_cords[1]] = hero
+        if isinstance(hero, Freeze):
+            self.field[field_cords[0]][field_cords[1]] = (hero, self.field[field_cords[0]][field_cords[1]])
+        else:
+            self.field[field_cords[0]][field_cords[1]] = hero
         hero.rect.x = field_cords[1] * self.cell_size + self.left
         hero.rect.y = field_cords[0] * self.cell_size + self.top
 

@@ -98,18 +98,17 @@ class Ballista(Building):
 
 
 class Spell(pygame.sprite.Sprite):
-    def __init__(self, group, color, name='spell'):
+    def __init__(self, group, color, name):
         super().__init__(group)
-        self.image = load_image('Bomb/bomb1.png', -1)
+        self.image = HERO_IMAGES[name]
         self.rect = self.image.get_rect()
         self.color = color
         self.name = name
 
 
 class Bomb(Spell):
-    name = 'bomb'
     def __init__(self, group, color):
-        super().__init__(group, color, Bomb.name)
+        super().__init__(group, color, 'bomb')
         self.damage = 1
         self.ready = False
 
@@ -118,6 +117,9 @@ class Bomb(Spell):
 
 
 class Freeze(Spell):
-    name = 'freeze'
     def __init__(self, group, color):
-        super().__init__(group, color, Freeze.name)
+        super().__init__(group, color, 'freeze')
+        self.is_active = True
+
+    def switch_active(self):
+        self.is_active = False if self.is_active else True

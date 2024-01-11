@@ -170,6 +170,9 @@ class Game:
     def bomb(self, spell):
         spell.switch_ready()
 
+    def freeze(self, spell):
+        spell.switch_active()
+
 
 running = True
 start_screen()
@@ -181,8 +184,8 @@ game.field.add_piece(axeman, (3, 4))
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
 spell_events = {
-    'freeze': (pygame.USEREVENT + 3, 3000),
-    'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000)
+    'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
+    'freeze': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000)
 }
 pygame.time.set_timer(spell_events['bomb'][0], 0)
 while running:
@@ -197,6 +200,9 @@ while running:
         elif event.type == 32868: #bomb
             pygame.time.set_timer(event, 0)
             game.bomb(event.spell)
+        elif event.type == 32869: #freeze
+            pygame.time.set_timer(event, 0)
+            game.freeze(event.spell)
         # for spell_name, value in spell_events.values():
         #     if event.type == value[1]:
         #         game.spell_event(spell_name)
