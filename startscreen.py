@@ -2,7 +2,7 @@ import pygame
 import pygame_gui
 import os
 
-from load_image import load_image
+from consts import load_image
 
 
 class StartScreen():

@@ -3,7 +3,7 @@ from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
 from hand import Hand
-from startscreen import start_screen
+from startscreen import StartScreen
 from field import Field
 from heart import Heart
 from heroes import Axeman, Hero, Spell
@@ -19,6 +19,8 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
+        start_screen = StartScreen(800, 600)
+        start_screen.run()
 
         # создаются экземпляры классов
         self.goldCoin = GoldCoin(all_sprites)
@@ -175,7 +177,6 @@ class Game:
 
 
 running = True
-start_screen()
 game = Game()
 
 axeman = Axeman(all_sprites, 'red')
