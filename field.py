@@ -53,6 +53,8 @@ class Field:
     def update(self, group, screen, current_color):
         def fight(i, j, hero, piece):
             f = False
+            if isinstance(piece, tuple):
+                piece = piece[1]
             if isinstance(piece, Piece) and piece.color != hero.color:
                 piece.beat(hero.damage)
                 f = True
@@ -91,9 +93,11 @@ class Field:
 
             for j in range(self.size[0]):
 
-                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista):
+                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista) or (isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and self.field[i][j][0].is_active and (isinstance(self.field[i][j][1], Hero) or isinstance(self.field[i][j][1], Ballista))):
                     hero = self.field[i][j]
-
+                    print(type(hero))
+                    if isinstance(self.field[i][j], tuple):
+                        hero = self.field[i][j][1]
                     for x in range(hero.attack_range + 1):
                         x = -x if hero.color == current_color else x
 
@@ -119,7 +123,10 @@ class Field:
                     group.remove(freeze)
 
         for i, j in cords_to_remove:
-            self.field[i][j] = 0
+            if not isinstance(self.field[i][j], tuple):
+                self.field[i][j] = 0
+            else:
+                self.field[i][j] = self.field[i][j][0], 0
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -133,13 +140,19 @@ class Field:
         return cell_x, cell_y
 
     def on_click(self, cell_coords, group, card, color):
-        if self.field[cell_coords[1]][cell_coords[0]]:
-            return False
         hero = card.link(group, color=color)
-        self.field[cell_coords[1]][cell_coords[0]] = hero
-        hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
-        hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
-        return hero
+        if isinstance(hero, Freeze):
+            self.field[cell_coords[1]][cell_coords[0]] = hero, self.field[cell_coords[1]][cell_coords[0]]
+            hero.rect.x = cell_coords[0] * self.cell_size + self.left
+            hero.rect.y = cell_coords[1] * self.cell_size + self.top
+            return hero
+        else:
+            if self.field[cell_coords[1]][cell_coords[0]]:
+                return False
+            self.field[cell_coords[1]][cell_coords[0]] = hero
+            hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
+            hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
+            return hero
 
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
@@ -170,7 +183,7 @@ class Field:
         hero.rect.x = field_cords[1] * self.cell_size + self.left
         hero.rect.y = field_cords[0] * self.cell_size + self.top
 
-    def draw_hp(self, hp, max_hp, screen, hero_cords):
+    def draw_hp(self, hp, max_hp, screen, hero_cords): # какой то баг
         y, x = hero_cords
         if y - 5 < 0:
             pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
