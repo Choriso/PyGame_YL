@@ -3,7 +3,7 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from heroes import Hero, Piece, Ballista
+from heroes import Hero, Piece, Ballista, Bomb
 from heart import Heart
 
 
@@ -106,6 +106,17 @@ class Field:
                                     if self.size[0] > j + a >= 0:
                                         piece = self.field[i + x][j + a]
                                         fight(i, j + a, hero, piece)
+                elif isinstance(self.field[i][j], Bomb) and self.field[i][j].ready:
+                    print(1)
+                    bomb = self.field[i][j]
+                    for y in (-1, 0, 1):
+                        for x in (-1, 0, 1):
+                            if (x or y) and self.size[1] > i + y >= 0 and self.size[0] > j + x >= 0:
+                                fight(i + y, j + x, bomb, self.field[i + y][j + x])
+                    group.remove(bomb)
+                    cords_to_remove.append((i, j))
+
+
 
         for i, j in cords_to_remove:
             self.field[i][j] = 0
@@ -128,7 +139,7 @@ class Field:
         self.field[cell_coords[1]][cell_coords[0]] = hero
         hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
         hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
-        return True
+        return hero
 
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
@@ -151,10 +162,10 @@ class Field:
             hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
             hero.rect.x -= (start_pos[1] - end_pos[1]) * self.cell_size
 
-    def add_piece(self, hero, cords):
-        self.field[cords[0]][cords[1]] = hero
-        hero.rect.x = cords[1] * self.cell_size + self.left
-        hero.rect.y = cords[0] * self.cell_size + self.top
+    def add_piece(self, hero, field_cords):
+        self.field[field_cords[0]][field_cords[1]] = hero
+        hero.rect.x = field_cords[1] * self.cell_size + self.left
+        hero.rect.y = field_cords[0] * self.cell_size + self.top
 
     def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords

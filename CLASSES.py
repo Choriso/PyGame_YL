@@ -15,6 +15,6 @@ CLASSES = {
     'canon': ...,
     'catapult': ...,
     'gold mine': ...,
-    'freeze': ...,
-    'bomb': ...,
+    'freeze': Freeze,
+    'bomb': Bomb,
 }

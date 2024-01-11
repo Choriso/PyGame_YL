@@ -1,5 +1,5 @@
 import pygame
-from consts import HERO_IMAGES
+from consts import HERO_IMAGES, load_image
 
 
 class Piece(pygame.sprite.Sprite):
@@ -95,3 +95,29 @@ class Ballista(Building):
         super().__init__(group, color, 4, 'ballista')
         self.attack_range = 2
         self.damage = 1
+
+
+class Spell(pygame.sprite.Sprite):
+    def __init__(self, group, color, name='spell'):
+        super().__init__(group)
+        self.image = load_image('Bomb/bomb1.png', -1)
+        self.rect = self.image.get_rect()
+        self.color = color
+        self.name = name
+
+
+class Bomb(Spell):
+    name = 'bomb'
+    def __init__(self, group, color):
+        super().__init__(group, color, Bomb.name)
+        self.damage = 1
+        self.ready = False
+
+    def switch_ready(self):
+        self.ready = False if self.ready else True
+
+
+class Freeze(Spell):
+    name = 'freeze'
+    def __init__(self, group, color):
+        super().__init__(group, color, Freeze.name)

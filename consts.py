@@ -42,7 +42,7 @@ CARD_IMAGES = {
     'catapult': ...,
     'gold mine': ...,
     'freeze': ...,
-    'bomb': ...,
+    'bomb': 'question.png',
 }
 
 PRICES = {
@@ -61,7 +61,7 @@ PRICES = {
     'catapult': ...,
     'gold mine': ...,
     'freeze': ...,
-    'bomb': ...,
+    'bomb': 1,
 }
 
 HERO_IMAGES = {

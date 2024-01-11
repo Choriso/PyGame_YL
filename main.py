@@ -6,7 +6,7 @@ from hand import Hand
 from startscreen import start_screen
 from field import Field
 from heart import Heart
-from heroes import Axeman, Hero
+from heroes import Axeman, Hero, Spell
 
 pygame.init()
 size = width, height = 450, 600
@@ -99,6 +99,10 @@ class Game:
             result = False
             if self.hand.chosen:  # если выбрана то поставить на поле
                 result = self.field.on_click(res4, all_sprites, self.hand.chosen, self.current_color)
+                if result and isinstance(result, Spell):
+                    event = spell_events[result.name][0]
+                    event.spell = result
+                    pygame.time.set_timer(event, spell_events[result.name][1])
                 if result:
                     all_sprites.remove(self.hand.chosen)
                     self.hand.chosen = None
@@ -160,6 +164,12 @@ class Game:
         self.hand.swap_hands(all_sprites)
         # осталось переставить карты и монетку
 
+    def second_layer(self):
+        self.hand.draw_stack_text(screen)
+
+    def bomb(self, spell):
+        spell.switch_ready()
+
 
 running = True
 start_screen()
@@ -168,10 +178,13 @@ game = Game()
 axeman = Axeman(all_sprites, 'red')
 axeman.change_state_and_image()
 game.field.add_piece(axeman, (3, 4))
-
-ATTACKEVENT = pygame.USEREVENT + 1
+ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
-
+spell_events = {
+    'freeze': (pygame.USEREVENT + 3, 3000),
+    'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000)
+}
+pygame.time.set_timer(spell_events['bomb'][0], 0)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -179,14 +192,21 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             game.action(event.pos)
-        elif event.type == ATTACKEVENT:
+        elif event.type == ATTACKEVENT.type:
             game.attack_update()
+        elif event.type == 32868: #bomb
+            pygame.time.set_timer(event, 0)
+            game.bomb(event.spell)
+        # for spell_name, value in spell_events.values():
+        #     if event.type == value[1]:
+        #         game.spell_event(spell_name)
 
     screen.fill((100, 100, 100))
     game.update()
     all_sprites.draw(screen)
     all_sprites.update(game.current_color, screen)
+    game.second_layer()
     pygame.display.flip()
-    clock.tick(6)
+    clock.tick(60)
 
 pygame.quit()

@@ -10,10 +10,10 @@ class Hand:
     def __init__(self):
         self.blue_hand = []
         self.red_hand = []
-        self.card_cnt = 0
         self.chosen = None
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
         self.current_color = 'blue'
+        self.stack_dict = None
 
     def update(self, surface):
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
@@ -40,16 +40,11 @@ class Hand:
         if self.chosen:
             self.chosen.rect.x = 315
             self.chosen.rect.y = 525
-
-        font = pygame.font.SysFont('default', 30, italic=False, bold=False)
-        for cnt, x in not_visited.values():
-            text = font.render(f'X{cnt}', 1, "black")
-            surface.blit(text, (x + 20, 518))
+        self.stack_dict = not_visited
 
     def add_card(self, card):
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
         hand.append(card)
-        self.card_cnt += 1
         return True
 
     def can_add(self):
@@ -68,7 +63,6 @@ class Hand:
         if self.chosen:
             hand.append(self.chosen)
         self.chosen = hand.pop(ind)
-        self.card_cnt -= 1
 
     def add_sprites(self, group):
         hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
@@ -84,3 +78,9 @@ class Hand:
         self.remove_sprites(group)
         self.current_color = 'blue' if self.current_color == 'red' else 'red'
         self.add_sprites(group)
+
+    def draw_stack_text(self, surface):
+        font = pygame.font.SysFont('default', 27, italic=False, bold=False)
+        for cnt, x in self.stack_dict.values():
+            text = font.render(f'X{cnt}', 1, "black")
+            surface.blit(text, (x + 20, 518))
