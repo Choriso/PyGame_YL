@@ -21,6 +21,10 @@ class Game:
     def __init__(self):
         start_screen = StartScreen(800, 600)
         start_screen.run()
+        self.player_names = {
+            1: start_screen.player_1_name,
+            2: start_screen.player_2_name
+        }
 
         # создаются экземпляры классов
         self.goldCoin = GoldCoin(all_sprites)
@@ -28,7 +32,7 @@ class Game:
         self.store = Store()
         self.hand = Hand()
 
-        tilemap = pygame.image.load('data\TexturedGrass.png')
+        tilemap = pygame.image.load('data/TexturedGrass.png')
         self.field = Field((21, 30), tilemap, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
@@ -44,9 +48,16 @@ class Game:
         self.is_showing_move_hints = False
         self.hints_params = None
 
-        self.turning_font = pygame.font.SysFont('default', 17, bold=True)
-        self.turning_text = self.turning_font.render('Сделать ход', 1, 'white')
+        self.turning_font = pygame.font.SysFont('default', 16, bold=True)
+        self.turning_text = self.turning_font.render('Make move', 1, 'white')
         self.pushed_turn_button_first_time = False
+
+        self.player_font = pygame.font.SysFont('default', 20, bold=True)
+        self.current_player = 1
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
+
+
+
 
         self.current_color = 'blue'
 
@@ -56,7 +67,8 @@ class Game:
         pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
-        screen.blit(self.turning_text, (371, 493))
+        screen.blit(self.turning_text, (372, 493))
+        screen.blit(self.player_text, (270, 584))
 
         self.field.draw(screen)
         self.store.update(screen)
@@ -79,7 +91,7 @@ class Game:
 
         elif self.pushed_turn_button_first_time and not res5:
             self.pushed_turn_button_first_time = False
-            self.turning_text = self.turning_font.render('Сделать ход', 1, 'white')
+            self.turning_text = self.turning_font.render('Make move', 1, 'white')
 
         if self.hand.can_add():  # можно ли добавить в руку карту если нет то нет смысла проверять колоду и магазин
             if res1[0]:
@@ -130,9 +142,9 @@ class Game:
             if self.pushed_turn_button_first_time:
                 self.flip_board()
                 self.pushed_turn_button_first_time = False
-                self.turning_text = self.turning_font.render('Сделать ход', 1, 'white')
+                self.turning_text = self.turning_font.render('Make move', 1, 'white')
             else:
-                self.turning_text = self.turning_font.render('Точно?', 1, 'white')
+                self.turning_text = self.turning_font.render('Shure?', 1, 'white')
                 self.pushed_turn_button_first_time = True
 
     def game_is_continue(self):
@@ -160,7 +172,12 @@ class Game:
         x, y = pos
         return 370 <= x <= 370 + 75 and 490 <= y <= 490 + 25
 
+    def change_player(self):
+        self.current_player = 1 if self.current_player == 2 else 2
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
+
     def flip_board(self):
+        self.change_player()
         self.field.flip()
         self.current_color = 'red' if self.current_color == 'blue' else 'blue'
         self.hand.swap_hands(all_sprites)
@@ -179,9 +196,6 @@ class Game:
 running = True
 game = Game()
 
-axeman = Axeman(all_sprites, 'red')
-axeman.change_state_and_image()
-game.field.add_piece(axeman, (3, 4))
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
 spell_events = {

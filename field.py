@@ -95,7 +95,6 @@ class Field:
 
                 if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista) or (isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and self.field[i][j][0].is_active and (isinstance(self.field[i][j][1], Hero) or isinstance(self.field[i][j][1], Ballista))):
                     hero = self.field[i][j]
-                    print(type(hero))
                     if isinstance(self.field[i][j], tuple):
                         hero = self.field[i][j][1]
                     for x in range(hero.attack_range + 1):
@@ -210,6 +209,7 @@ class Field:
 
 def main():
     pygame.init()
+    print()
     screen = pygame.display.set_mode((800, 600))
     while True:
         for event in pygame.event.get():
