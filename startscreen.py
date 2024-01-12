@@ -13,6 +13,7 @@ class StartScreen():
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((width, height))
+        pygame.display.set_icon(load_image("Logo.png"))
         pygame.display.set_caption("Stratego")
 
         self.manager = pygame_gui.UIManager((width, height))
