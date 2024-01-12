@@ -35,14 +35,15 @@ CARD_IMAGES = {
     'cavalry': 'Конница.png',
     'rogue': 'Проныра.png',
     'ballista': 'Баллиста.png',
-    'fence': "",
-    'wall': "",
+    'fence': "Забор.png",
+    'stone fence': 'Стена.png',
+    'shield': 'Щит.png',
     'thorn': ...,
     'canon': ...,
     'catapult': ...,
-    'gold mine': ...,
+    'gold mine': "Золотая шахта.png",
     'freeze': 'Заморозка.png',
-    'bomb': ...,
+    'bomb': "Бомба.png",
 }
 
 PRICES = {
@@ -55,13 +56,14 @@ PRICES = {
     'ballista': 3,
     'fence': 1,
     'stone fence': 2,
-    'wall': ...,
+    'wall': 2,
+    'shield': 1,
     'thorn': ...,
     'canon': ...,
     'catapult': ...,
-    'gold mine': ...,
-    'freeze': 1,
-    'bomb': ...,
+    'gold mine': 2,
+    'freeze': 2,
+    'bomb': 2,
 }
 
 HERO_IMAGES = {
@@ -91,19 +93,20 @@ HERO_IMAGES = {
             'back': load_image('rogue_back.png', -1)
         },
         'fence': {
-            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), True, True),
             'back': load_image('Wooden_fence.png', -1)
         },
         'stone fence': {
-            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), True, True),
             'back': load_image('Stone_fence.png', -1)
         },
         'ballista': {
-            'front': pygame.transform.flip(load_image('ballista_blue.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('ballista_blue.png', -1), True, True),
             'back': load_image('ballista_blue.png', -1)
         },
-        'wall': {
-            'front': '',
+        'shield': {
+            'font': load_image('shield.png', -1),
+            'back': load_image('shield.png', -1)
         },
         'thorn': {
             'front': '',
@@ -115,13 +118,8 @@ HERO_IMAGES = {
             'front': '',
         },
         'gold mine': {
-            'front': '',
-        },
-        'freeze': {
-            'front': '',
-        },
-        'bomb': {
-            'front': '',
+            'front': pygame.transform.flip(load_image('Gold_mine/Gold_mine1.png', -1), True, False),
+            'back': load_image('Gold_mine/Gold_mine1.png', -1)
         },
         'heart': load_image('Heart_blue.png', -1)
     },
@@ -151,20 +149,20 @@ HERO_IMAGES = {
             'back': load_image('rogue_red_back.png', -1)
         },
         'fence': {
-            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('Wooden_fence.png', -1), True, True),
             'back': load_image('Wooden_fence.png', -1)
         },
         'stone fence': {
-            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('Stone_fence.png', -1), True, True),
             'back': load_image('Stone_fence.png', -1)
         },
         'ballista': {
-            'front': pygame.transform.flip(load_image('ballista_red.png', -1), False, True),
+            'front': pygame.transform.flip(load_image('ballista_red.png', -1), True, True),
             'back': load_image('ballista_red.png', -1)
         },
-        'wall': {
-            'front': '',
-            'back': ''
+        'shield': {
+            'font': load_image('shield.png', -1),
+            'back': load_image('shield.png', -1)
         },
         'thorn': {
             'front': '',
@@ -174,21 +172,9 @@ HERO_IMAGES = {
             'front': '',
             'back': ''
         },
-        'catapult': {
-            'front': '',
-            'back': ''
-        },
         'gold mine': {
-            'front': '',
-            'back': ''
-        },
-        'freeze': {
-            'front': '',
-            'back': ''
-        },
-        'bomb': {
-            'front': '',
-            'back': ''
+            'front': pygame.transform.flip(load_image('Gold_mine/Gold_mine1.png', -1), True, False),
+            'back': load_image('Gold_mine/Gold_mine1.png', -1)
         },
         'heart': load_image('Heart_red.png', -1)
     },
