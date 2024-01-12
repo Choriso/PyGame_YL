@@ -54,12 +54,12 @@ class StartScreen():
         )
 
         btn_start = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((self.width // 2 - 60, self.height - 130), (120, 70)),
+            relative_rect=pygame.Rect((self.width // 2 - 60, self.height - 280), (120, 70)),
             text='',
             manager=self.manager,
         )
         btn_image_start = pygame_gui.elements.UIImage(
-            relative_rect=pygame.Rect((self.width // 2 - 10, self.height - 118), (30, 44)),
+            relative_rect=pygame.Rect((self.width // 2 - 10, self.height - 268), (30, 44)),
             image_surface=load_image('Play.png'),
             manager=self.manager
         )
