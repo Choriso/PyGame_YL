@@ -3,6 +3,7 @@ import sys
 import random
 
 from CLASSES import CLASSES
+from consts import load_image
 from heroes import Hero, Piece, Ballista, Bomb, Freeze
 from heart import Heart
 
@@ -15,8 +16,8 @@ class Cell:
 
 class Field:
     def __init__(self, size, tilemap, bg_color):
-        self.left = 0
-        self.top = 0
+        self.left = 10
+        self.top = 10
         self.cell_size = 17
         self.size = size
         self.bg_color = bg_color
@@ -28,6 +29,7 @@ class Field:
         self.drawing_hp_params = None
 
     def draw(self, screen):
+
         # screen.fill(self.bg_color)
         for row in self.cells:
             for cell in row:
@@ -36,19 +38,26 @@ class Field:
         if self.is_drawing_hp:
             for i1, j1 in self.drawing_hp_params[3]:
                 self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+        scale = 7.49
+        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (48 * scale, 68 * scale)), (self.left, self.top))
 
     def draw_dashed_line(self, screen):
-        # Рисуем пунктирные линии
         dash_length = 10
         space_length = 7
-        for x in range(self.cell_size, 515, self.cell_size):
-            for y in range(space_length // 2, 515, dash_length + space_length):
-                if x < 360 - dash_length:
+
+        # Draw vertical dashed lines
+        for x in range(self.cell_size, (self.size[0] + 1) * self.cell_size, self.cell_size):
+            for y in range(space_length // 2, self.size[1] * self.cell_size, dash_length + space_length):
+                if x < self.size[0] * self.cell_size:
                     pygame.draw.line(screen, (0, 0, 0), (x + self.left, y + self.top),
                                      (x + self.left, y + dash_length + self.top))
-                if y < 360 - dash_length:
-                    pygame.draw.line(screen, (0, 0, 0), (y + self.left, x + self.top),
-                                     (y + dash_length + self.left, x + self.top))
+
+        # Draw horizontal dashed lines
+        for y in range(self.cell_size, (self.size[1] + 1) * self.cell_size, self.cell_size):
+            for x in range(space_length // 2, self.size[0] * self.cell_size, dash_length + space_length):
+                if y < self.size[1] * self.cell_size:
+                    pygame.draw.line(screen, (0, 0, 0), (x + self.left, y + self.top),
+                                     (x + dash_length + self.left, y + self.top))
 
     def update(self, group, screen, current_color):
         def fight(i, j, hero, piece):

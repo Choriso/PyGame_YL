@@ -1,4 +1,6 @@
 import pygame
+
+from consts import load_image
 from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
@@ -33,6 +35,7 @@ class Game:
         self.hand = Hand()
 
         tilemap = pygame.image.load('data/TexturedGrass.png')
+
         self.field = Field((21, 30), tilemap, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
@@ -56,16 +59,19 @@ class Game:
         self.current_player = 1
         self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
-
-
-
         self.current_color = 'blue'
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
-        pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
-        pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
-        pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
-        pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
+        bg_size = 600
+        screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
+        scale = 5
+        screen.blit(pygame.transform.scale(load_image("Panel.png"), (60 * scale, 13 * scale)), (10, 521))
+        #pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
+        #pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
+        scale = 1.5
+        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (25 * scale, 30 * scale)), (311, 521))
+        #pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
+        #pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
         screen.blit(self.turning_text, (372, 493))
         screen.blit(self.player_text, (270, 584))
@@ -212,10 +218,10 @@ while running:
             game.action(event.pos)
         elif event.type == ATTACKEVENT.type:
             game.attack_update()
-        elif event.type == 32868: #bomb
+        elif event.type == 32868:  # bomb
             pygame.time.set_timer(event, 0)
             game.bomb(event.spell)
-        elif event.type == 32869: #freeze
+        elif event.type == 32869:  # freeze
             pygame.time.set_timer(event, 0)
             game.freeze(event.spell)
         # for spell_name, value in spell_events.values():
