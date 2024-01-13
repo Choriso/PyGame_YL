@@ -10,10 +10,9 @@ CLASSES = {
     'fence': Fence,
     'stone fence': StoneFence,
     'ballista': Ballista,
-    'wall': ...,
+    'shield': Shield,
     'thorn': ...,  # колючка
     'canon': ...,
-    'catapult': ...,
     'gold mine': ...,
     'freeze': Freeze,
     'bomb': Bomb,
