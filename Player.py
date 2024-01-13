@@ -11,7 +11,6 @@ class Player:
         conn = sqlite3.connect('player_data.db')
         cursor = conn.cursor()
 
-        # Создаем таблицу, если ее нет
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS players (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -21,19 +20,16 @@ class Player:
             )
         ''')
 
-        # Проверяем, есть ли уже такой игрок в базе
         cursor.execute('SELECT * FROM players WHERE name=?', (self.name,))
         existing_player = cursor.fetchone()
 
         if existing_player:
-            # Если игрок уже существует, обновляем его данные
             cursor.execute('''
                 UPDATE players 
                 SET password=?, score=?
                 WHERE name=?
             ''', (self.password, self.score, self.name))
         else:
-            # Иначе создаем новую запись
             cursor.execute('''
                 INSERT INTO players (name, password, score)
                 VALUES (?, ?, ?)
@@ -53,7 +49,34 @@ class Player:
         conn.close()
 
         if player_data:
-            # Возвращаем экземпляр класса Player с загруженными данными
             return cls(name=player_data[1], password=player_data[2])
 
         return None
+
+    @classmethod
+    def get_all_players(cls):
+        conn = sqlite3.connect('player_data.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM players')
+        players_data = cursor.fetchall()
+
+        conn.close()
+
+        players_list = [cls(name=player[1], password=player[2]) for player in players_data]
+        return players_list
+
+    @classmethod
+    def check_credentials(cls, name, password):
+        conn = sqlite3.connect('player_data.db')
+        cursor = conn.cursor()
+
+        cursor.execute('SELECT * FROM players WHERE name=? AND password=?', (name, password))
+        user_data = cursor.fetchone()
+
+        conn.close()
+
+        if user_data:
+            return {"name": user_data[1], "score": user_data[3]}
+        else:
+            return None
