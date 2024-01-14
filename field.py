@@ -7,6 +7,9 @@ from consts import load_image
 from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
 
+size = width, height = 500, 700
+width_scale = width / 450
+height_scale = height / 600
 
 class Cell:
     def __init__(self, x, y, image, cell_size):
@@ -39,7 +42,7 @@ class Field:
             for params in self.drawing_hp_params:
                 self.draw_hp(*params)
         scale = 7.49
-        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (48 * scale, 68 * scale)),
+        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
                     (self.left, self.top))
 
     def draw_dashed_line(self, screen):

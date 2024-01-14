@@ -8,10 +8,13 @@ from hand import Hand
 from startscreen import StartScreen
 from field import Field
 from heart import Heart
-from heroes import Axeman, Hero, Spell
+from heroes import Hero, Spell
 
 pygame.init()
-size = width, height = 450, 600
+size = width, height = 500, 700
+width_scale = width / 450
+height_scale = height / 600
+
 screen = pygame.display.set_mode(size)
 screen.fill('white')
 all_sprites = pygame.sprite.Group()
@@ -36,7 +39,7 @@ class Game:
 
         tilemap = pygame.image.load('data/TexturedGrass.png')
 
-        self.field = Field((21, 30), tilemap, 'white')
+        self.field = Field((int(21 * width_scale), int(30 * height_scale)), tilemap, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
         self.field.add_piece(self.blue_heart, (self.field.size[1] - 1, self.field.size[0] // 2))
@@ -63,19 +66,22 @@ class Game:
         self.current_color = 'blue'
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
-        bg_size = 600
+        bg_size = height
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
         scale = 5
-        screen.blit(pygame.transform.scale(load_image("Panel.png"), (60 * scale, 13 * scale)), (10, 521))
+        screen.blit(pygame.transform.scale(load_image("Panel.png"),
+                                           (int(60 * scale * width_scale), int(13 * scale * height_scale))),
+                                           (int(10 * width_scale), int(521 * height_scale)))
         # pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
         # pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
         scale = 1.5
-        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (25 * scale, 30 * scale)), (311, 521))
+        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale * width_scale), int(30 * scale * height_scale))),
+                    (int(311 * width_scale), int(521 * height_scale)))
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
-        screen.blit(self.turning_text, (372, 493))
-        screen.blit(self.player_text, (270, 584))
+        screen.blit(self.turning_text, (int(372 * width_scale), int(493 * height_scale)))
+        screen.blit(self.player_text, (int(270 * width_scale), int(584 * height_scale)))
 
         self.field.draw(screen)
         self.store.update(screen)
@@ -98,7 +104,7 @@ class Game:
 
         elif self.pushed_turn_button_first_time and not res5:
             self.pushed_turn_button_first_time = False
-            self.turning_text = self.turning_font.render('Make move', 1, 'white')
+            self.turning_text = self.turning_font.render('Make move', True, 'white')
 
         if self.hand.can_add():  # можно ли добавить в руку карту если нет то нет смысла проверять колоду и магазин
             if res1[0]:
@@ -177,7 +183,7 @@ class Game:
 
     def turn_button_concerning(self, pos):
         x, y = pos
-        return 370 <= x <= 370 + 75 and 490 <= y <= 490 + 25
+        return 370 * width_scale <= x <= 432 * width_scale and 490 * height_scale <= y <= 510 * height_scale
 
     def change_player(self):
         self.current_player = 1 if self.current_player == 2 else 2

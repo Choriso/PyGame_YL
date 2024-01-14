@@ -2,25 +2,26 @@ import pygame
 from consts import load_image
 
 pygame.init()
-size = width, height = 450, 600
+size = width, height = 500, 700
 screen = pygame.display.set_mode(size)
 # screen.fill('white')
 all_sprites = pygame.sprite.Group()
-
+width_scale = width / 450
+height_scale = height / 600
 
 class GoldCoin(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image('gold.jpg', -1), (50, 50))
+    image = pygame.transform.scale(load_image('gold.jpg', -1), (50 * width_scale, 50 * height_scale))
 
     def __init__(self, group):
         super().__init__(group)
         self.image = GoldCoin.image
         self.rect = self.image.get_rect()
-        self.rect.x = 400
-        self.rect.y = 550
+        self.rect.x = int(400 * width_scale)
+        self.rect.y = int(550 * height_scale)
         self.golds = {'blue': 5, 'red': 4}
         # self.blue_gold = 5
         # self.red_gold = 4
-        self.gold_to_pos = {1: (419, 564), 2: (412, 564)}  # change
+        self.gold_to_pos = {1: (int(419 * width_scale), int(564 * height_scale)), 2: (int(412 * width_scale), int(564 * height_scale))}  # change
 
     def update(self, color, surface):
         gold = self.golds[color]

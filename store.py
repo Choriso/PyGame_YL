@@ -5,15 +5,18 @@ from consts import PRICES
 from CLASSES import CLASSES
 
 pygame.init()
-size = width, height = 450, 600
+size = width, height = 500, 700
+width_scale = width / 450
+height_scale = height / 600
 screen = pygame.display.set_mode(size)
 screen.fill('grey')
 all_sprites = pygame.sprite.Group()
 
 
+
 class Store:
     def __init__(self):
-        self.poses = {1: (375, 75), 2: (415, 75), 3: (375, 130), 4: (415, 130)}
+        self.poses = {1: (int(375 * width_scale), int(75 * height_scale)), 2: (int(415 * width_scale), int(75 * height_scale)), 3: (int(375 * width_scale), int(130 * height_scale)), 4: (int(415 * width_scale), int(130 * height_scale))}
         first = Card(all_sprites, 'knight')
         first.rect.x, first.rect.y = self.poses[1]
 

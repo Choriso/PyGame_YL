@@ -1,9 +1,11 @@
 import pygame
 
 pygame.init()
-size = width, height = 450, 600
+size = width, height = 500, 700
 screen = pygame.display.set_mode(size)
 screen.fill('white')
+width_scale = width / 450
+height_scale = height / 600
 
 
 class Hand:
@@ -19,7 +21,7 @@ class Hand:
 
     def update(self, surface):
         hand = self.players[self.current_color][0]
-        x = 17
+        x = 19
         visited = []
         not_visited = {}
         pos = {}
@@ -27,7 +29,7 @@ class Hand:
         for card in hand:
             if card.name not in visited:
                 card.rect.x = x
-                card.rect.y = 531
+                card.rect.y = int(532 * height_scale)
                 visited.append(card.name)
                 pos[card.name] = x
                 x += 36
@@ -35,15 +37,15 @@ class Hand:
             else:
                 if card.name in not_visited:
                     card.rect.x = not_visited[card.name][1]
-                    card.rect.y = 531
+                    card.rect.y = int(532 * height_scale)
                     not_visited[card.name][0] += 1
                 else:
                     card.rect.x = pos[card.name]
-                    card.rect.y = 531
+                    card.rect.y = int(532 * height_scale)
                     not_visited[card.name] = [2, pos[card.name]]
         if self.chosen:
-            self.chosen.rect.x = 315
-            self.chosen.rect.y = 525
+            self.chosen.rect.x = int(315 * width_scale)
+            self.chosen.rect.y = int(522 * height_scale)
         self.stack_dict = not_visited
         self.players[self.current_color][1] = k
 
@@ -87,4 +89,4 @@ class Hand:
         font = pygame.font.SysFont('default', 27, italic=False, bold=False)
         for cnt, x in self.stack_dict.values():
             text = font.render(f'X{cnt}', True, "black")
-            surface.blit(text, (x + 20, 518))
+            surface.blit(text, (int((x + 20) * width_scale), int(518 * height_scale)))
