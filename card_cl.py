@@ -39,7 +39,7 @@ class Deck(pygame.sprite.Sprite):
     def take_card(self):
         card = self.cur_card
         # self.cur_card = Card(all_sprites, choice(list(CLASSES.keys())))  # переделать
-        self.cur_card = Card(all_sprites, choice(('knight', 'archer', 'rogue', 'halberdier', 'axeman', 'cavalry', 'ballista', 'freeze')))
+        self.cur_card = Card(all_sprites, choice(('gold mine', 'fence', 'stone fence', 'knight', 'archer', 'rogue', 'halberdier', 'axeman', 'cavalry', 'ballista', 'freeze', 'bomb')))
         self.cur_card.rect.x = 410
         self.cur_card.rect.y = 300
         self.group.add(self.cur_card)

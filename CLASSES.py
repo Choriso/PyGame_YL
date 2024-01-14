@@ -13,7 +13,7 @@ CLASSES = {
     'shield': Shield,
     'thorn': ...,  # колючка
     'canon': ...,
-    'gold mine': ...,
+    'gold mine': GoldMine,
     'freeze': Freeze,
     'bomb': Bomb,
 }

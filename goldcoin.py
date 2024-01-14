@@ -17,26 +17,24 @@ class GoldCoin(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 400
         self.rect.y = 550
-        self.blue_gold = 5
-        self.red_gold = 4
+        self.golds = {'blue': 5, 'red': 4}
+        # self.blue_gold = 5
+        # self.red_gold = 4
         self.gold_to_pos = {1: (419, 564), 2: (412, 564)}  # change
 
     def update(self, color, surface):
-        gold = self.blue_gold if color == 'blue' else self.red_gold
+        gold = self.golds[color]
         font = pygame.font.SysFont('default', 32, italic=False, bold=False)
         text = font.render(f'{gold}', 1, "#895404")
         pos = self.gold_to_pos[len(str(gold))]
         surface.blit(text, pos)
 
     def buy(self, price, color):
-        gold = self.blue_gold if color == 'blue' else self.red_gold
+        gold = self.golds[color]
         if gold >= price:
             gold -= price
             gold = max(gold, 0)
-            if color == 'blue':
-                self.blue_gold = gold
-            else:
-                self.red_gold = gold
+            self.golds[color] = gold
             return True
         return False
 

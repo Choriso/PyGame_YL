@@ -101,10 +101,10 @@ class StartScreen():
         self.rules_button = btn_info
         self.start = btn_start
 
-        players = Player.get_all_players()
-        if len(players) >= 2:
-            self.player_1_name = players[0].name
-            self.player_2_name = players[1].name
+        # players = Player.get_all_players()
+        # if len(players) >= 2:
+        #     self.player_1_name = players[0].name
+        #     self.player_2_name = players[1].name
 
     def close_settings(self):
         self.settings_btn.enable()

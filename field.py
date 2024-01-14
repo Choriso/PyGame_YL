@@ -4,7 +4,7 @@ import random
 
 from CLASSES import CLASSES
 from consts import load_image
-from heroes import Hero, Piece, Ballista, Bomb, Freeze
+from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
 
 
@@ -36,10 +36,11 @@ class Field:
                 screen.blit(cell.image, cell.rect.move(self.left, self.top))
         self.draw_dashed_line(screen)
         if self.is_drawing_hp:
-            for i1, j1 in self.drawing_hp_params[3]:
-                self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+            for params in self.drawing_hp_params:
+                self.draw_hp(*params)
         scale = 7.49
-        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (48 * scale, 68 * scale)), (self.left, self.top))
+        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (48 * scale, 68 * scale)),
+                    (self.left, self.top))
 
     def draw_dashed_line(self, screen):
         dash_length = 10
@@ -69,15 +70,15 @@ class Field:
                 f = True
                 res = piece.is_alive()
                 if self.is_drawing_hp:
-                    self.drawing_hp_params[3].append(
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                    self.drawing_hp_params.append((piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                    j * self.cell_size + self.left)))
                 else:
                     self.is_drawing_hp = True
-                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+                    self.drawing_hp_params = [(piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                j * self.cell_size + self.left))]
 
-                for i1, j1 in self.drawing_hp_params[3]:
-                    self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+                for params in self.drawing_hp_params:
+                    self.draw_hp(*params)
 
                 if not res:
                     group.remove(piece)
@@ -87,12 +88,12 @@ class Field:
                 piece.beat(hero.damage)
                 f = True
                 if self.is_drawing_hp:
-                    self.drawing_hp_params[3].append(
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                    self.drawing_hp_params.append((piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                    j * self.cell_size + self.left)))
                 else:
                     self.is_drawing_hp = True
-                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+                    self.drawing_hp_params = [(piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                j * self.cell_size + self.left))]
 
             return f
 
@@ -102,10 +103,8 @@ class Field:
 
             for j in range(self.size[0]):
 
-                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista) or (isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and self.field[i][j][0].is_active and (isinstance(self.field[i][j][1], Hero) or isinstance(self.field[i][j][1], Ballista))):
+                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista):
                     hero = self.field[i][j]
-                    if isinstance(self.field[i][j], tuple):
-                        hero = self.field[i][j][1]
                     for x in range(hero.attack_range + 1):
                         x = -x if hero.color == current_color else x
 
@@ -118,6 +117,7 @@ class Field:
                                     if self.size[0] > j + a >= 0:
                                         piece = self.field[i + x][j + a]
                                         fight(i, j + a, hero, piece)
+
                 elif isinstance(self.field[i][j], Bomb) and self.field[i][j].ready:
                     bomb = self.field[i][j]
                     for y in (-1, 0, 1):
@@ -126,7 +126,8 @@ class Field:
                                 fight(i + y, j + x, bomb, self.field[i + y][j + x])
                     group.remove(bomb)
                     cords_to_remove.append((i, j))
-                elif isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and not self.field[i][j][0].is_active:
+                elif isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and not \
+                        self.field[i][j][0].is_active:
                     freeze, self.field[i][j] = self.field[i][j]
                     group.remove(freeze)
 
@@ -156,6 +157,7 @@ class Field:
             return hero
         else:
             if self.field[cell_coords[1]][cell_coords[0]]:
+                group.remove(hero)
                 return False
             self.field[cell_coords[1]][cell_coords[0]] = hero
             hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
@@ -191,7 +193,7 @@ class Field:
         hero.rect.x = field_cords[1] * self.cell_size + self.left
         hero.rect.y = field_cords[0] * self.cell_size + self.top
 
-    def draw_hp(self, hp, max_hp, screen, hero_cords): # какой то баг
+    def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords
         if y - 5 < 0:
             pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
@@ -211,9 +213,25 @@ class Field:
             for j in range(self.size[0]):
                 if self.field[i][j]:
                     piece = self.field[i][j]
-                    piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
-                    if isinstance(piece, Piece):
-                        piece.change_state_and_image()
+                    if isinstance(piece, tuple):
+                        piece[0].rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                        if piece[1]:
+                            piece[1].rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                            if isinstance(piece[1], Piece):
+                                piece[1].change_state_and_image()
+                    else:
+                        piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                        if isinstance(piece, Piece):
+                            piece.change_state_and_image()
+
+    def goldmine_num(self, color):
+        k = 0
+        for i in self.field:
+            for piece in i:
+                if isinstance(piece, GoldMine) and piece.color == color:
+                    k += 1
+        return k
+
 
 
 def main():

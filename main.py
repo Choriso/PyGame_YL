@@ -50,6 +50,7 @@ class Game:
 
         self.is_showing_move_hints = False
         self.hints_params = None
+        self.move_cnt = 0
 
         self.turning_font = pygame.font.SysFont('default', 16, bold=True)
         self.turning_text = self.turning_font.render('Make move', 1, 'white')
@@ -66,12 +67,12 @@ class Game:
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
         scale = 5
         screen.blit(pygame.transform.scale(load_image("Panel.png"), (60 * scale, 13 * scale)), (10, 521))
-        #pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
-        #pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
+        # pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
+        # pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
         scale = 1.5
         screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (25 * scale, 30 * scale)), (311, 521))
-        #pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
-        #pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
+        # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
+        # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
         screen.blit(self.turning_text, (372, 493))
         screen.blit(self.player_text, (270, 584))
@@ -120,9 +121,9 @@ class Game:
             if self.hand.chosen:  # если выбрана то поставить на поле
                 result = self.field.on_click(res4, all_sprites, self.hand.chosen, self.current_color)
                 if result and isinstance(result, Spell):
-                    event = spell_events[result.name][0]
+                    event = events[result.name][0]
                     event.spell = result
-                    pygame.time.set_timer(event, spell_events[result.name][1])
+                    pygame.time.set_timer(event, events[result.name][1])
                 if result:
                     all_sprites.remove(self.hand.chosen)
                     self.hand.chosen = None
@@ -187,7 +188,9 @@ class Game:
         self.field.flip()
         self.current_color = 'red' if self.current_color == 'blue' else 'blue'
         self.hand.swap_hands(all_sprites)
-        # осталось переставить карты и монетку
+        self.move_cnt += 1
+        for i in range(self.field.goldmine_num(self.current_color)):
+            pygame.event.post(events['gold mine'])
 
     def second_layer(self):
         self.hand.draw_stack_text(screen)
@@ -198,17 +201,23 @@ class Game:
     def freeze(self, spell):
         spell.switch_active()
 
+    def give_coin(self, num):
+        self.goldCoin.golds[self.current_color] += num
+
 
 running = True
 game = Game()
 
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
-spell_events = {
+
+events = {
     'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
-    'freeze': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000)
+    'freeze': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
+    'gold mine': (pygame.event.Event(pygame.event.custom_type(), piece=None))
 }
-pygame.time.set_timer(spell_events['bomb'][0], 0)
+
+pygame.time.set_timer(events['bomb'][0], 0)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -218,13 +227,15 @@ while running:
             game.action(event.pos)
         elif event.type == ATTACKEVENT.type:
             game.attack_update()
-        elif event.type == 32868:  # bomb
+        elif event.type == events['bomb'][0].type:  # bomb
             pygame.time.set_timer(event, 0)
             game.bomb(event.spell)
-        elif event.type == 32869:  # freeze
+        elif event.type == events['freeze'][0].type:  # freeze
             pygame.time.set_timer(event, 0)
             game.freeze(event.spell)
-        # for spell_name, value in spell_events.values():
+        elif event.type == events['gold mine'].type:
+            game.give_coin(1)
+        # for spell_name, value in events.values():
         #     if event.type == value[1]:
         #         game.spell_event(spell_name)
 
