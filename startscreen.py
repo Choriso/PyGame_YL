@@ -26,8 +26,8 @@ class StartScreen():
         self.dialog_signin = None
 
         pygame.init()
-        self.main_screen_width = 500
-        self.main_screen_height = 700
+        self.main_screen_width = (500 * SCREEN_SIZE)
+        self.main_screen_height = (620 * SCREEN_SIZE)
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((width, height))

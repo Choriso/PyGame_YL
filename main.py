@@ -12,7 +12,7 @@ from heroes import Hero, Spell
 from endscreen import end_screen
 
 pygame.init()
-size = width, height = 500, 700
+size = width, height = 500 * 1.3, 620 * 1.3
 
 screen = pygame.display.set_mode(size)
 screen.fill('white')
@@ -38,7 +38,7 @@ class Game:
 
         tilemap = pygame.image.load('data/TexturedGrass.png')
 
-        self.field = Field((int(21 * width_scale), int(30 * height_scale)), tilemap, 'white')
+        self.field = Field((21, 30), tilemap, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
         self.field.add_piece(self.blue_heart, (self.field.size[1] - 1, self.field.size[0] // 2))
@@ -63,6 +63,16 @@ class Game:
         self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
         self.current_color = 'blue'
+        self.num_taken_cards = 0
+        self.num_moved_heroes = 0
+        self.num_can_move = 2
+        self.scores = {
+            'blue': 0,
+            'red': 0
+        }
+
+        self.time = 0
+        self.time_font = pygame.font.SysFont('default', 30, bold=True)
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
         res = self.is_game_over()
@@ -75,11 +85,11 @@ class Game:
         pygame.draw.rect(screen, '#c3d657', (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#8ecd65', (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         scale = 1.5
-        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
-                    (int(311), int(521)))
+        # screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
+        #             (int(311), int(521)))
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
-        screen.blit(text, (width - 80, 50))
+        screen.blit(text, (width - 115, 220))
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
@@ -196,6 +206,7 @@ class Game:
 
 
     def game_over(self, winner):
+        end_screen(self.scores[winner], winner)
         print('Всё')
 
     def attack_update(self):
@@ -263,6 +274,9 @@ while running:
 
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             game.action(event.pos)
+        elif event.type == pygame.KEYUP and event.key == 27:
+            screen = pygame.display.set_mode((800, 600))
+            game.start_screen.run()
         elif event.type == ATTACKEVENT.type:
             game.attack_update()
         elif event.type == events['bomb'][0].type:  # bomb

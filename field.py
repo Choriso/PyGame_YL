@@ -3,9 +3,10 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from consts import load_image
+from consts import load_image, SCREEN_SCALE
 from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
+
 
 size = width, height = 500, 700
 
