@@ -1,13 +1,11 @@
 import pygame
 from card_cl import Card
 from random import choice
-from consts import PRICES
+from consts import PRICES, SCREEN_SCALE
 from CLASSES import CLASSES
 
 pygame.init()
 size = width, height = 500, 700
-width_scale = width / 450
-height_scale = height / 600
 screen = pygame.display.set_mode(size)
 screen.fill('grey')
 all_sprites = pygame.sprite.Group()
@@ -16,7 +14,13 @@ all_sprites = pygame.sprite.Group()
 
 class Store:
     def __init__(self):
-        self.poses = {1: (int(375 * width_scale), int(75 * height_scale)), 2: (int(415 * width_scale), int(75 * height_scale)), 3: (int(375 * width_scale), int(130 * height_scale)), 4: (int(415 * width_scale), int(130 * height_scale))}
+        pos_x = 370
+        pos_y = 9
+        offset = 10
+        self.poses = {1: (int(pos_x * SCREEN_SCALE), int(pos_y  * SCREEN_SCALE)),
+                      2: (int(pos_x * SCREEN_SCALE), int(pos_y * SCREEN_SCALE + (int(40 * SCREEN_SCALE * 1.7)) + offset)),
+                      3: (int(pos_x * SCREEN_SCALE + (int(30 * SCREEN_SCALE * 1.7)) + offset), int(pos_y * SCREEN_SCALE)),
+                      4: (int(pos_x * SCREEN_SCALE + (int(30 * SCREEN_SCALE * 1.7)) + offset), int(pos_y * SCREEN_SCALE + (int(40 * SCREEN_SCALE * 1.7)) + offset))}
         first = Card(all_sprites, 'knight')
         first.rect.x, first.rect.y = self.poses[1]
 

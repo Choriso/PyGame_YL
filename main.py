@@ -1,6 +1,6 @@
 import pygame
 
-from consts import load_image
+from consts import load_image, SCREEN_SCALE
 from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
@@ -13,10 +13,6 @@ from endscreen import end_screen
 
 pygame.init()
 size = width, height = 500, 700
-width_scale = width / 450
-height_scale = height / 600
-end_screen(30, 'Kokakolia')
-
 
 screen = pygame.display.set_mode(size)
 screen.fill('white')
@@ -27,7 +23,7 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
-        self.start_screen = StartScreen(800, 600)
+        self.start_screen = StartScreen(800, 600, SCREEN_SCALE)
         self.start_screen.run()
         self.player_names = {
             1: self.start_screen.player_1_name,
@@ -67,16 +63,6 @@ class Game:
         self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
         self.current_color = 'blue'
-        self.num_taken_cards = 0
-        self.num_moved_heroes = 0
-        self.num_can_move = 2
-        self.scores = {
-            'blue': 0,
-            'red': 0
-        }
-
-        self.time = 0
-        self.time_font = pygame.font.SysFont('default', 30, bold=True)
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
         res = self.is_game_over()
@@ -84,26 +70,22 @@ class Game:
             winner = self.who_won()
             self.game_over(winner)
         # res = self.game_is_continue()
-        bg_size = height
+        bg_size = 850
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
-        scale = 5
-        screen.blit(pygame.transform.scale(load_image("Panel.png"),
-                                           (int(60 * scale * width_scale), int(13 * scale * height_scale))),
-                    (int(10 * width_scale), int(521 * height_scale)))
-        # pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
-        # pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
+        pygame.draw.rect(screen, '#c3d657', (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#8ecd65', (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         scale = 1.5
-        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"),
-                                           (int(25 * scale * width_scale), int(30 * scale * height_scale))),
-                    (int(311 * width_scale), int(521 * height_scale)))
+        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
+                    (int(311), int(521)))
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
         screen.blit(text, (width - 80, 50))
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
-        screen.blit(self.turning_text, (int(372 * width_scale), int(493 * height_scale)))
-        screen.blit(self.player_text, (int(270 * width_scale), int(584 * height_scale)))
+        self.turning_button_coords = (510, 620)
+        screen.blit(self.turning_text, (self.turning_button_coords))
+        screen.blit(self.player_text, (int(270), int(584)))
 
         self.field.draw(screen)
         self.store.update(screen)
@@ -224,7 +206,11 @@ class Game:
 
     def turn_button_concerning(self, pos):
         x, y = pos
-        return 370 * width_scale <= x <= 432 * width_scale and 490 * height_scale <= y <= 510 * height_scale
+        offset = 10
+        text_pos = self.turning_text.get_rect()[2:]
+        print(text_pos)
+        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + text_pos[0] + offset and\
+            self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + text_pos[1] + offset
 
     def change_player(self):
         self.current_player = 1 if self.current_player == 2 else 2

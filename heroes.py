@@ -1,5 +1,5 @@
 import pygame
-from consts import HERO_IMAGES, load_image
+from consts import HERO_IMAGES, load_image, SCREEN_SCALE
 
 
 class Piece(pygame.sprite.Sprite):
@@ -7,7 +7,7 @@ class Piece(pygame.sprite.Sprite):
         super().__init__(group)
         self.name = name
         self.state = 'back'
-        self.image = HERO_IMAGES[color][name][self.state]
+        self.image = pygame.transform.scale(HERO_IMAGES[color][name][self.state], (17 * SCREEN_SCALE, 17 * SCREEN_SCALE))
         self.rect = self.image.get_rect()
         self.hp = hp
         self.color = color

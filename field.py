@@ -8,8 +8,6 @@ from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
 
 size = width, height = 500, 700
-width_scale = width / 450
-height_scale = height / 600
 
 
 class Cell:
@@ -22,7 +20,7 @@ class Field:
     def __init__(self, size, tilemap, bg_color):
         self.left = 10
         self.top = 10
-        self.cell_size = 17
+        self.cell_size = round(17 * SCREEN_SCALE)
         self.size = size
         self.bg_color = bg_color
         self.cells = [[Cell(x * self.cell_size, y * self.cell_size, tilemap.subsurface(
@@ -44,10 +42,9 @@ class Field:
         if self.is_drawing_hp:
             for params in self.drawing_hp_params:
                 self.draw_hp(*params)
-        scale = 7.49
-        screen.blit(pygame.transform.scale(load_image("Field_around.png"),
-                                           (int(48 * scale * width_scale), int(68 * scale * height_scale))),
-                    (self.left, self.top))
+        #scale = 7.49
+        #screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
+        #            (self.left, self.top))
 
     def draw_dashed_line(self, screen):
         dash_length = 10
@@ -217,11 +214,11 @@ class Field:
     def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords
         if y - 5 < 0:
-            pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y + 13), (17 * SCREEN_SCALE, 4  * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp  * SCREEN_SCALE), 4 * SCREEN_SCALE)))
         else:
-            pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y - 5), (17 * SCREEN_SCALE, 4 * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp * SCREEN_SCALE), 4 * SCREEN_SCALE)))
 
     def flip(self):
         self.field = self.field[::-1]

@@ -9,7 +9,7 @@ from Music import MusicPlayer
 
 
 class StartScreen():
-    def __init__(self, width, height):
+    def __init__(self, width, height, SCREEN_SIZE=1):
 
         self.acsept_new_player = None
         self.cencel_btn = None
