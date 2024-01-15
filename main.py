@@ -9,11 +9,14 @@ from startscreen import StartScreen
 from field import Field
 from heart import Heart
 from heroes import Hero, Spell
+from endscreen import end_screen
 
 pygame.init()
 size = width, height = 500, 700
 width_scale = width / 450
 height_scale = height / 600
+end_screen(30, 'Kokakolia')
+
 
 screen = pygame.display.set_mode(size)
 screen.fill('white')
