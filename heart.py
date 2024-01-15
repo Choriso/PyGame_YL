@@ -1,5 +1,5 @@
 import pygame
-from consts import load_image, HERO_IMAGES
+from consts import load_image, HERO_IMAGES, SCREEN_SCALE
 
 
 class Heart(pygame.sprite.Sprite):
@@ -8,7 +8,7 @@ class Heart(pygame.sprite.Sprite):
     def __init__(self, group, color):
         super().__init__(group)
         self.rect = self.image.get_rect()
-        self.image = HERO_IMAGES[color]['heart']
+        self.image = pygame.transform.scale(HERO_IMAGES[color]['heart'], (17 * SCREEN_SCALE, 17 * SCREEN_SCALE))
         self.hp = 50
         self.color = color
         self.max_hp = self.hp

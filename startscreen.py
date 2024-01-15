@@ -26,8 +26,8 @@ class StartScreen():
         self.dialog_signin = None
 
         pygame.init()
-        self.main_screen_width = 500
-        self.main_screen_height = 700
+        self.main_screen_width = 600
+        self.main_screen_height = 850
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((width, height))
@@ -43,7 +43,7 @@ class StartScreen():
 
         self.player_1_name = 'Игрок 1'
         self.player_2_name = 'Игрок 2'
-        self.music_volume = 100
+        self.music_volume = 20
 
         self.player_1_registered = True
         self.player_2_registered = False

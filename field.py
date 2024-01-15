@@ -3,13 +3,11 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from consts import load_image
+from consts import load_image, SCREEN_SCALE
 from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
 
 size = width, height = 500, 700
-width_scale = width / 450
-height_scale = height / 600
 
 class Cell:
     def __init__(self, x, y, image, cell_size):
@@ -21,7 +19,7 @@ class Field:
     def __init__(self, size, tilemap, bg_color):
         self.left = 10
         self.top = 10
-        self.cell_size = 17
+        self.cell_size = round(17 * SCREEN_SCALE)
         self.size = size
         self.bg_color = bg_color
         self.cells = [[Cell(x * self.cell_size, y * self.cell_size, tilemap.subsurface(
@@ -41,9 +39,9 @@ class Field:
         if self.is_drawing_hp:
             for params in self.drawing_hp_params:
                 self.draw_hp(*params)
-        scale = 7.49
-        screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
-                    (self.left, self.top))
+        #scale = 7.49
+        #screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
+        #            (self.left, self.top))
 
     def draw_dashed_line(self, screen):
         dash_length = 10
