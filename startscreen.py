@@ -9,7 +9,7 @@ from Music import MusicPlayer
 
 
 class StartScreen():
-    def __init__(self, width, height):
+    def __init__(self, width, height, SCREEN_SIZE=1):
 
         self.acsept_new_player = None
         self.cencel_btn = None
@@ -26,8 +26,8 @@ class StartScreen():
         self.dialog_signin = None
 
         pygame.init()
-        self.main_screen_width = 600
-        self.main_screen_height = 850
+        self.main_screen_width = 500 * SCREEN_SIZE
+        self.main_screen_height = 620 * SCREEN_SIZE
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((width, height))

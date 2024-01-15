@@ -197,11 +197,11 @@ class Field:
     def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords
         if y - 5 < 0:
-            pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y + 13), (17 * SCREEN_SCALE, 4  * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp  * SCREEN_SCALE), 4 * SCREEN_SCALE)))
         else:
-            pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y - 5), (17 * SCREEN_SCALE, 4 * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp * SCREEN_SCALE), 4 * SCREEN_SCALE)))
 
     def flip(self):
         self.field = self.field[::-1]

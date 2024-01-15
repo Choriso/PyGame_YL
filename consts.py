@@ -27,7 +27,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-SCREEN_SCALE = 1.1
+SCREEN_SCALE = 1.3
 CARD_IMAGES = {
     'knight': 'Пехота.png',
     'archer': "Лучник.png",

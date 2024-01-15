@@ -1,4 +1,8 @@
+import os
+
 import pygame
+
+from consts import SCREEN_SCALE
 
 pygame.init()
 size = width, height = 500, 700
@@ -8,6 +12,7 @@ screen.fill('white')
 
 class Hand:
     def __init__(self):
+        self.pos_y = None
         self.players = {
             'blue': [[], 0],
             'red': [[], 0],
@@ -19,7 +24,8 @@ class Hand:
 
     def update(self, surface):
         hand = self.players[self.current_color][0]
-        x = 19
+        x = 10
+        self.pos_y = int(530) * SCREEN_SCALE
         visited = []
         not_visited = {}
         pos = {}
@@ -27,23 +33,23 @@ class Hand:
         for card in hand:
             if card.name not in visited:
                 card.rect.x = x
-                card.rect.y = int(532)
+                card.rect.y = self.pos_y
                 visited.append(card.name)
                 pos[card.name] = x
-                x += 36
+                x += int(55 * SCREEN_SCALE)
                 k += 1
             else:
                 if card.name in not_visited:
                     card.rect.x = not_visited[card.name][1]
-                    card.rect.y = int(532)
+                    card.rect.y = self.pos_y
                     not_visited[card.name][0] += 1
                 else:
                     card.rect.x = pos[card.name]
-                    card.rect.y = int(532)
+                    card.rect.y = self.pos_y
                     not_visited[card.name] = [2, pos[card.name]]
         if self.chosen:
-            self.chosen.rect.x = int(315)
-            self.chosen.rect.y = int(522)
+            self.chosen.rect.x = int(522)
+            self.chosen.rect.y = int(486)
         self.stack_dict = not_visited
         self.players[self.current_color][1] = k
 
@@ -84,7 +90,8 @@ class Hand:
         self.add_sprites(group)
 
     def draw_stack_text(self, surface):
-        font = pygame.font.SysFont('default', 27, italic=False, bold=False)
+        fullname = os.path.join('data', "DungeonFont.ttf")
+        font = pygame.font.Font(fullname, int(19 * SCREEN_SCALE))
         for cnt, x in self.stack_dict.values():
             text = font.render(f'X{cnt}', True, "black")
-            surface.blit(text, (int((x + 20)), int(518)))
+            surface.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))

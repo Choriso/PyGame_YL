@@ -14,10 +14,13 @@ all_sprites = pygame.sprite.Group()
 
 class Store:
     def __init__(self):
-        self.poses = {1: (int(375), int(75)),
-                      2: (int(415), int(75)),
-                      3: (int(375), int(130)),
-                      4: (int(415), int(130))}
+        pos_x = 370
+        pos_y = 9
+        offset = 10
+        self.poses = {1: (int(pos_x * SCREEN_SCALE), int(pos_y  * SCREEN_SCALE)),
+                      2: (int(pos_x * SCREEN_SCALE), int(pos_y * SCREEN_SCALE + (int(40 * SCREEN_SCALE * 1.7)) + offset)),
+                      3: (int(pos_x * SCREEN_SCALE + (int(30 * SCREEN_SCALE * 1.7)) + offset), int(pos_y * SCREEN_SCALE)),
+                      4: (int(pos_x * SCREEN_SCALE + (int(30 * SCREEN_SCALE * 1.7)) + offset), int(pos_y * SCREEN_SCALE + (int(40 * SCREEN_SCALE * 1.7)) + offset))}
         first = Card(all_sprites, 'knight')
         first.rect.x, first.rect.y = self.poses[1]
 

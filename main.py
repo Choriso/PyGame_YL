@@ -1,6 +1,6 @@
 import pygame
 
-from consts import load_image
+from consts import load_image, SCREEN_SCALE
 from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
@@ -22,7 +22,7 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
-        start_screen = StartScreen(800, 600)
+        start_screen = StartScreen(800, 600, SCREEN_SCALE)
         start_screen.run()
         self.player_names = {
             1: start_screen.player_1_name,
@@ -40,10 +40,10 @@ class Game:
         self.field = Field((int(21), int(30)), tilemap, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
-        self.field.add_piece(self.blue_heart, (self.field.size[1] - 1, self.field.size[0] // 2))
+        self.field.add_piece(self.blue_heart, (self.field.size[1] - 3, self.field.size[0] // 2))
 
         self.red_heart = Heart(all_sprites, 'red')
-        self.field.add_piece(self.red_heart, (0, self.field.size[0] // 2))
+        self.field.add_piece(self.red_heart, (2, self.field.size[0] // 2))
 
         # добавляются спрайты и рисуются цены
         self.store.add_sprites(all_sprites)
@@ -53,11 +53,11 @@ class Game:
         self.hints_params = None
         self.move_cnt = 0
 
-        self.turning_font = pygame.font.SysFont('default', 16, bold=True)
+        self.turning_font = pygame.font.SysFont('default', int(20 * SCREEN_SCALE), bold=True)
         self.turning_text = self.turning_font.render('Make move', 1, 'white')
         self.pushed_turn_button_first_time = False
 
-        self.player_font = pygame.font.SysFont('default', 20, bold=True)
+        self.player_font = pygame.font.SysFont('default', int(20 * SCREEN_SCALE), bold=True)
         self.current_player = 1
         self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
@@ -66,19 +66,14 @@ class Game:
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
         bg_size = 850
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
-        scale = 5
-        #screen.blit(pygame.transform.scale(load_image("Panel.png"),
-                                           #(int(60 * scale * width_scale), int(13 * scale * height_scale))),
-                                           #(int(10 * width_scale), int(521 * height_scale)))
-        # pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
-        # pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
+        pygame.draw.rect(screen, '#c3d657', (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#8ecd65', (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         scale = 1.5
         screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
                     (int(311), int(521)))
-        # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
-        # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
-        screen.blit(self.turning_text, (int(372), int(493)))
+        self.turning_button_coords = (510, 620)
+        screen.blit(self.turning_text, (self.turning_button_coords))
         screen.blit(self.player_text, (int(270), int(584)))
 
         self.field.draw(screen)
@@ -181,7 +176,11 @@ class Game:
 
     def turn_button_concerning(self, pos):
         x, y = pos
-        return 370 <= x <= 432 and 490 <= y <= 510
+        offset = 10
+        text_pos = self.turning_text.get_rect()[2:]
+        print(text_pos)
+        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + text_pos[0] + offset and\
+            self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + text_pos[1] + offset
 
     def change_player(self):
         self.current_player = 1 if self.current_player == 2 else 2
