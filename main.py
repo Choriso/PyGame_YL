@@ -24,11 +24,11 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
-        start_screen = StartScreen(800, 600)
-        start_screen.run()
+        self.start_screen = StartScreen(800, 600)
+        self.start_screen.run()
         self.player_names = {
-            1: start_screen.player_1_name,
-            2: start_screen.player_2_name
+            1: self.start_screen.player_1_name,
+            2: self.start_screen.player_2_name
         }
 
         # создаются экземпляры классов
@@ -64,19 +64,38 @@ class Game:
         self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
         self.current_color = 'blue'
+        self.num_taken_cards = 0
+        self.num_moved_heroes = 0
+        self.num_can_move = 2
+        self.scores = {
+            'blue': 0,
+            'red': 0
+        }
+
+        self.time = 0
+        self.time_font = pygame.font.SysFont('default', 30, bold=True)
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
+        res = self.is_game_over()
+        if res:
+            winner = self.who_won()
+            self.game_over(winner)
+        # res = self.game_is_continue()
         bg_size = height
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
         scale = 5
         screen.blit(pygame.transform.scale(load_image("Panel.png"),
                                            (int(60 * scale * width_scale), int(13 * scale * height_scale))),
-                                           (int(10 * width_scale), int(521 * height_scale)))
+                    (int(10 * width_scale), int(521 * height_scale)))
         # pygame.draw.line(screen, 'black', (360, 0), (360, 600), 5)
         # pygame.draw.line(screen, 'black', (0, 512), (360, 512), 5)
         scale = 1.5
-        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale * width_scale), int(30 * scale * height_scale))),
+        screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"),
+                                           (int(25 * scale * width_scale), int(30 * scale * height_scale))),
                     (int(311 * width_scale), int(521 * height_scale)))
+
+        text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
+        screen.blit(text, (width - 80, 50))
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
@@ -86,8 +105,22 @@ class Game:
         self.field.draw(screen)
         self.store.update(screen)
         self.hand.update(screen)
+        self.store.draw_prices(screen)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
             self.field.draw_move_hints(*self.hints_params)
+
+        k1, k2 = self.field.killed_num()
+        self.goldCoin.golds['red'] += k1
+        self.goldCoin.golds['blue'] += k2
+        self.scores['blue'] += k1 * 2
+        self.scores['red'] += k2 * 2
+
+        if self.move_cnt > 20:
+            self.num_can_move = 5
+        elif self.move_cnt > 10:
+            self.num_can_move = 4
+        elif self.move_cnt > 5:
+            self.num_can_move = 3
 
     def action(self, pos):
         # узнает куда тыкнул игрок
@@ -115,10 +148,13 @@ class Game:
                 if result:
                     self.store.take_cards(res1[1], all_sprites)
                     self.hand.add_card(card)
+                    self.scores[self.current_color] += 2
             elif res2:
                 # просто берется карта и добавляется
-                card = self.deck.take_card()
-                self.hand.add_card(card)
+                if self.num_taken_cards < 3:
+                    card = self.deck.take_card()
+                    self.num_taken_cards += 1
+                    self.hand.add_card(card)
         if type(res3) is int:
             # выбирается карта
             self.hand.choose(res3)
@@ -136,7 +172,7 @@ class Game:
             if result is False:  # в другом случае или если не поставилась карта
                 hero = self.field.get_piece(res4)
                 if isinstance(hero,
-                              Hero):  # если нажали на героя то рисуются подсказки для хода
+                              Hero) and hero.color == self.current_color:  # если нажали на героя то рисуются подсказки для хода
                     self.hints_params = hero.dist_range, res4, screen, hero.color
                     self.field.draw_move_hints(*self.hints_params)
                     self.is_showing_move_hints = True
@@ -144,11 +180,15 @@ class Game:
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
                     a = [self.hints_params[1][1] + i for i in range(-self.hints_params[0], self.hints_params[0] + 1) if
                          i != 0]
-                    if res4[1] in a and res4[0] in [self.hints_params[1][0] + i for i in (-1, 0, 1)]:
+                    if res4[1] in a and res4[0] in [self.hints_params[1][0] + i for i in
+                                                    (-1, 0, 1)] and self.num_moved_heroes < self.num_can_move and \
+                            self.hints_params[3] == self.current_color:
                         start = self.hints_params[1][1], self.hints_params[1][0]
                         end = res4[1], res4[0]
                         hero = self.field.field[self.hints_params[1][1]][self.hints_params[1][0]]
-                        self.field.move_hero(start, end, hero)
+                        res = self.field.move_hero(start, end, hero)
+                        if res:
+                            self.num_moved_heroes += 1
                     self.is_showing_move_hints = False
                     self.hints_params = None
         elif res5 and not self.hand.chosen:
@@ -160,14 +200,15 @@ class Game:
                 self.turning_text = self.turning_font.render('Shure?', 1, 'white')
                 self.pushed_turn_button_first_time = True
 
-    def game_is_continue(self):
-        return self.blue_heart.hp > 0 and self.red_heart.hp > 0
+    def is_game_over(self):
+        return self.blue_heart.hp < 0 or self.red_heart.hp < 0 or self.time // 60 >= 5
 
     def who_won(self):
         if self.blue_heart.hp:
             return 'blue'
         else:
             return 'red'
+
 
     def game_over(self, winner):
         print('Всё')
@@ -176,10 +217,7 @@ class Game:
         self.field.is_drawing_hp = False
         self.field.drawing_hp_params = None
         self.field.update(all_sprites, screen, self.current_color)
-        res = self.game_is_continue()
-        if not res:
-            winner = self.who_won()
-            self.game_over(winner)
+
 
     def turn_button_concerning(self, pos):
         x, y = pos
@@ -197,6 +235,8 @@ class Game:
         self.move_cnt += 1
         for i in range(self.field.goldmine_num(self.current_color)):
             pygame.event.post(events['gold mine'])
+        self.num_taken_cards = 0
+        self.num_moved_heroes = 0
 
     def second_layer(self):
         self.hand.draw_stack_text(screen)
@@ -216,6 +256,9 @@ game = Game()
 
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
+
+TIMEVENT = pygame.event.Event(pygame.event.custom_type())
+pygame.time.set_timer(TIMEVENT, 1000)
 
 events = {
     'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
@@ -241,6 +284,8 @@ while running:
             game.freeze(event.spell)
         elif event.type == events['gold mine'].type:
             game.give_coin(1)
+        elif event.type == TIMEVENT.type:
+            game.time += 1
         # for spell_name, value in events.values():
         #     if event.type == value[1]:
         #         game.spell_event(spell_name)

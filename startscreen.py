@@ -43,7 +43,7 @@ class StartScreen():
 
         self.player_1_name = 'Игрок 1'
         self.player_2_name = 'Игрок 2'
-        self.music_volume = 100
+        self.music_volume = 0
 
         self.player_1_registered = True
         self.player_2_registered = False
