@@ -13,6 +13,7 @@ from endscreen import end_screen
 
 pygame.init()
 size = width, height = 500 * 1.3, 620 * 1.3
+start_screen_size = (800, 600)
 
 screen = pygame.display.set_mode(size)
 screen.fill('white')
@@ -23,11 +24,9 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
-        self.start_screen = StartScreen(800, 600, SCREEN_SCALE)
-        self.start_screen.run()
         self.player_names = {
-            1: self.start_screen.player_1_name,
-            2: self.start_screen.player_2_name
+            1: start_screen.player_1_name,
+            2: start_screen.player_2_name
         }
 
         # создаются экземпляры классов
@@ -65,7 +64,7 @@ class Game:
         self.current_color = 'blue'
         self.num_taken_cards = 0
         self.num_moved_heroes = 0
-        self.num_can_move = 2
+        self.num_can_move = 50
         self.scores = {
             'blue': 0,
             'red': 0
@@ -78,18 +77,25 @@ class Game:
         res = self.is_game_over()
         if res:
             winner = self.who_won()
+            if self.blue_heart.hp <= 0:
+                self.scores['red'] += 20
+            elif self.red_heart.hp <= 0:
+                self.scores['blue'] += 20
             self.game_over(winner)
         # res = self.game_is_continue()
         bg_size = 850
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
-        pygame.draw.rect(screen, '#c3d657', (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
-        pygame.draw.rect(screen, '#8ecd65', (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#c3d657',
+                         (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#8ecd65',
+                         (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         scale = 1.5
         # screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
         #             (int(311), int(521)))
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
         screen.blit(text, (width - 115, 220))
+
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
@@ -196,7 +202,7 @@ class Game:
                 self.pushed_turn_button_first_time = True
 
     def is_game_over(self):
-        return self.blue_heart.hp < 0 or self.red_heart.hp < 0 or self.time // 60 >= 5
+        return self.blue_heart.hp <= 0 or self.red_heart.hp <= 0 or self.time // 60 >= 5
 
     def who_won(self):
         if self.blue_heart.hp:
@@ -204,23 +210,23 @@ class Game:
         else:
             return 'red'
 
-
     def game_over(self, winner):
-        end_screen(self.scores[winner], winner)
-        print('Всё')
+        num = 1 if winner == 'blue' else 2
+        event = events['new game']
+        event.score = self.scores[winner]
+        event.winner = self.player_names[num]
+        pygame.event.post(event)
 
     def attack_update(self):
         self.field.is_drawing_hp = False
         self.field.drawing_hp_params = None
         self.field.update(all_sprites, screen, self.current_color)
 
-
     def turn_button_concerning(self, pos):
         x, y = pos
         offset = 10
         text_pos = self.turning_text.get_rect()[2:]
-        print(text_pos)
-        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + text_pos[0] + offset and\
+        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + text_pos[0] + offset and \
             self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + text_pos[1] + offset
 
     def change_player(self):
@@ -252,6 +258,9 @@ class Game:
 
 
 running = True
+start_screen = StartScreen(800, 600, SCREEN_SCALE)
+start_screen.run()
+
 game = Game()
 
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
@@ -263,7 +272,8 @@ pygame.time.set_timer(TIMEVENT, 1000)
 events = {
     'bomb': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
     'freeze': (pygame.event.Event(pygame.event.custom_type(), spell=None), 2000),
-    'gold mine': (pygame.event.Event(pygame.event.custom_type(), piece=None))
+    'gold mine': (pygame.event.Event(pygame.event.custom_type())),
+    'new game': (pygame.event.Event(pygame.event.custom_type(), score=None, winner=None))
 }
 
 pygame.time.set_timer(events['bomb'][0], 0)
@@ -276,7 +286,7 @@ while running:
             game.action(event.pos)
         elif event.type == pygame.KEYUP and event.key == 27:
             screen = pygame.display.set_mode((800, 600))
-            game.start_screen.run()
+            start_screen.run()
         elif event.type == ATTACKEVENT.type:
             game.attack_update()
         elif event.type == events['bomb'][0].type:  # bomb
@@ -289,6 +299,14 @@ while running:
             game.give_coin(1)
         elif event.type == TIMEVENT.type:
             game.time += 1
+        elif event.type == events['new game'].type:
+
+            end_screen(event.score, event.winner)
+            screen = pygame.display.set_mode(start_screen_size)
+            all_sprites = pygame.sprite.Group()
+            game = Game()
+            start_screen.run()
+            clock = pygame.time.Clock()
         # for spell_name, value in events.values():
         #     if event.type == value[1]:
         #         game.spell_event(spell_name)
