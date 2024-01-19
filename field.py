@@ -7,7 +7,9 @@ from consts import load_image, SCREEN_SCALE
 from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
 
+
 size = width, height = 500, 700
+
 
 class Cell:
     def __init__(self, x, y, image, cell_size):
@@ -28,6 +30,8 @@ class Field:
         self.field = [[0] * size[0] for i in range(size[1])]
         self.is_drawing_hp = False
         self.drawing_hp_params = None
+        self.killed_by_blue = 0
+        self.killed_by_red = 0
 
     def draw(self, screen):
 
@@ -82,6 +86,10 @@ class Field:
                     self.draw_hp(*params)
 
                 if not res:
+                    if hero.color == 'blue':
+                        self.killed_by_blue += 1
+                    elif hero.color == 'red':
+                        self.killed_by_red += 1
                     group.remove(piece)
                     cords_to_remove.append((i + x, j))
 
@@ -138,6 +146,11 @@ class Field:
             else:
                 self.field[i][j] = self.field[i][j][0], 0
 
+    def killed_num(self):
+        k1, k2 = self.killed_by_red, self.killed_by_blue
+        self.killed_by_red, self.killed_by_blue = 0, 0
+        return k1, k2
+
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
         return cell
@@ -150,20 +163,23 @@ class Field:
         return cell_x, cell_y
 
     def on_click(self, cell_coords, group, card, color):
-        hero = card.link(group, color=color)
-        if isinstance(hero, Freeze):
-            self.field[cell_coords[1]][cell_coords[0]] = hero, self.field[cell_coords[1]][cell_coords[0]]
-            hero.rect.x = cell_coords[0] * self.cell_size + self.left
-            hero.rect.y = cell_coords[1] * self.cell_size + self.top
-            return hero
+        if cell_coords[1] >= self.size[1] // 2:
+            hero = card.link(group, color=color)
+            if isinstance(hero, Freeze):
+                self.field[cell_coords[1]][cell_coords[0]] = hero, self.field[cell_coords[1]][cell_coords[0]]
+                hero.rect.x = cell_coords[0] * self.cell_size + self.left
+                hero.rect.y = cell_coords[1] * self.cell_size + self.top
+                return hero
+            else:
+                if self.field[cell_coords[1]][cell_coords[0]]:
+                    group.remove(hero)
+                    return False
+                self.field[cell_coords[1]][cell_coords[0]] = hero
+                hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
+                hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
+                return hero
         else:
-            if self.field[cell_coords[1]][cell_coords[0]]:
-                group.remove(hero)
-                return False
-            self.field[cell_coords[1]][cell_coords[0]] = hero
-            hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
-            hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
-            return hero
+            return False
 
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
@@ -185,6 +201,8 @@ class Field:
                 start_pos[1]]
             hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
             hero.rect.x -= (start_pos[1] - end_pos[1]) * self.cell_size
+            return True
+        return False
 
     def add_piece(self, hero, field_cords):
         if isinstance(hero, Freeze):
@@ -232,7 +250,6 @@ class Field:
                 if isinstance(piece, GoldMine) and piece.color == color:
                     k += 1
         return k
-
 
 
 def main():

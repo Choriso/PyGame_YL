@@ -26,8 +26,8 @@ class StartScreen():
         self.dialog_signin = None
 
         pygame.init()
-        self.main_screen_width = 500 * SCREEN_SIZE
-        self.main_screen_height = 620 * SCREEN_SIZE
+        self.main_screen_width = (500 * SCREEN_SIZE)
+        self.main_screen_height = (620 * SCREEN_SIZE)
         self.width = width
         self.height = height
         self.screen = pygame.display.set_mode((width, height))
@@ -43,14 +43,13 @@ class StartScreen():
 
         self.player_1_name = 'Игрок 1'
         self.player_2_name = 'Игрок 2'
-        self.music_volume = 20
+        self.music_volume = 0
 
-        self.player_1_registered = True
+        self.player_1_registered = False
         self.player_2_registered = False
 
-        test = Player("Игрок 1fghhfghgfываапапвапвы", "some_secure_password")
-        self.player_1 = test
-        self.player_2 = None
+        self.player_1 = Player("Игрок 1", "Игрок 1")
+        self.player_2 = Player("Игрок 1", "Игрок 1")
 
         self.create_gui()
 
@@ -380,7 +379,7 @@ class StartScreen():
                             data = Player.check_credentials(self.input_box_name.get_text(),
                                                             self.input_box_password.get_text())
                             if data:
-                                self.succesfull_registration(player_init)
+                                self.succesfull_registration(player_init, data)
                             else:
                                 self.error_dialog = pygame_gui.windows.ui_message_window.UIMessageWindow(
                                     rect=pygame.Rect((self.width // 2 - 200, self.height // 2 - 50), (250, 100)),

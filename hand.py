@@ -90,8 +90,9 @@ class Hand:
         self.add_sprites(group)
 
     def draw_stack_text(self, surface):
-        fullname = os.path.join('data', "DungeonFont.ttf")
-        font = pygame.font.Font(fullname, int(19 * SCREEN_SCALE))
-        for cnt, x in self.stack_dict.values():
-            text = font.render(f'X{cnt}', True, "black")
-            surface.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))
+        if self.stack_dict:
+            fullname = os.path.join('data', "DungeonFont.ttf")
+            font = pygame.font.Font(fullname, int(19 * SCREEN_SCALE))
+            for cnt, x in self.stack_dict.values():
+                text = font.render(f'X{cnt}', True, "black")
+                surface.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))

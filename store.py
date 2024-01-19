@@ -1,3 +1,5 @@
+import os
+
 import pygame
 from card_cl import Card
 from random import choice
@@ -35,6 +37,7 @@ class Store:
 
         self.cur_cards = [first, second, third, fourth]
 
+
     def take_cards(self, ind, group):
         card = self.cur_cards[ind]
         self.cur_cards[ind] = Card(all_sprites, choice(
@@ -52,10 +55,13 @@ class Store:
 
     def draw_prices(self, surface):
         for i in range(4):
-            pygame.draw.circle(surface, 'yellow', (self.poses[i + 1][0] + 15, self.poses[i + 1][1] + 44), 9)
-            font = pygame.font.SysFont('default', 20, italic=False, bold=False)
+            pos_x = self.poses[i + 1][0] + int(45 * SCREEN_SCALE)
+            pos_y =  self.poses[i + 1][1] + int(65 * SCREEN_SCALE)
+            pygame.draw.circle(surface, "#fdd13f", (pos_x, pos_y), 10)
+            fullname = os.path.join('data', "Cunia.otf")
+            font = pygame.font.Font(fullname, int(12 * SCREEN_SCALE))
             text = font.render(f'{PRICES[self.cur_cards[i].name]}', 1, "#895404")
-            surface.blit(text, (self.poses[i + 1][0] + 12, self.poses[i + 1][1] + 38))
+            surface.blit(text, (pos_x - 4, pos_y - 9))
 
     def is_concerning(self, pos):
         for i in range(4):
@@ -65,26 +71,3 @@ class Store:
 
     def costs(self, card):
         return PRICES[card.name]
-
-
-def main():
-    running = True
-    store = Store()
-    store.draw_prices(screen)
-    while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                print(store.take_cards(event.pos, all_sprites))
-
-        all_sprites.draw(screen)
-        all_sprites.update()
-        pygame.display.flip()
-
-    pygame.quit()
-
-
-if __name__ == '__main__':
-    main()

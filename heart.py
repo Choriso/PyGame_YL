@@ -11,6 +11,8 @@ class Heart(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(HERO_IMAGES[color]['heart'], (17 * SCREEN_SCALE, 17 * SCREEN_SCALE))
         self.hp = 50
         self.color = color
+        # if self.color == 'blue':
+        #     self.hp = 0
         self.max_hp = self.hp
 
     def beat(self, damage):
