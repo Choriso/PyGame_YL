@@ -1,3 +1,5 @@
+import os
+
 import pygame
 
 from consts import load_image, SCREEN_SCALE
@@ -47,21 +49,19 @@ class Game:
 
         # добавляются спрайты и рисуются цены
         self.store.add_sprites(all_sprites)
-        self.store.draw_prices(screen)
 
         self.is_showing_move_hints = False
         self.hints_params = None
         self.move_cnt = 0
 
         self.turning_font = pygame.font.SysFont('default', 16, bold=True)
-        self.turning_text = self.turning_font.render('Make move', 1, 'white')
-        self.pushed_turn_button_first_time = False
-
-        self.player_font = pygame.font.SysFont('default', 20, bold=True)
-        self.current_player = 1
-        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
 
         self.current_color = 'blue'
+        fullname = os.path.join('data', "Cunia.otf")
+        self.player_font = pygame.font.Font(fullname, int(17 * SCREEN_SCALE))
+        self.current_player = 1
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, self.current_color)
+
         self.num_taken_cards = 0
         self.num_moved_heroes = 0
         self.num_can_move = 50
@@ -89,9 +89,13 @@ class Game:
                          (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#8ecd65',
                          (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
-        scale = 1.5
+        pygame.draw.rect(screen, '#c3d657',
+                         (9 * SCREEN_SCALE, 520 * SCREEN_SCALE, int(355 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#c3d657',
+                         (int(355 * SCREEN_SCALE) + 16 , 16 + int(508 * SCREEN_SCALE), int(117 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
         # screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
         #             (int(311), int(521)))
+
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
         screen.blit(text, (width - 115, 220))
@@ -99,14 +103,18 @@ class Game:
         # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
         # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
 
-        self.turning_button_coords = (510, 620)
-        screen.blit(self.turning_text, (self.turning_button_coords))
-        screen.blit(self.player_text, (int(270), int(584)))
+        fullname = os.path.join('data', "Cunia.otf")
+        turn_font = pygame.font.Font(fullname, int(9 * SCREEN_SCALE))
+        turn_text = turn_font.render("Закончить ход", 1, "white")
+
+        self.turning_button_coords = (538, 710)
+        self.turn_image = pygame.transform.scale(load_image("Redo.png"), (27 * SCREEN_SCALE, 29 * SCREEN_SCALE))
+        screen.blit(self.turn_image, self.turning_button_coords)
+        screen.blit(turn_text, (self.turning_button_coords[0] - 31, self.turning_button_coords[1] + 42))
 
         self.field.draw(screen)
-        self.store.update(screen)
+        screen.blit(self.player_text, (width - 140, height - 200))
         self.hand.update(screen)
-        self.store.draw_prices(screen)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
             self.field.draw_move_hints(*self.hints_params)
 
@@ -123,6 +131,9 @@ class Game:
         elif self.move_cnt > 5:
             self.num_can_move = 3
 
+    def store_prices(self):
+        self.store.update(screen)
+
     def action(self, pos):
         # узнает куда тыкнул игрок
         res1 = self.store.is_concerning(pos)
@@ -135,10 +146,6 @@ class Game:
         if self.is_showing_move_hints and not res4:
             self.is_showing_move_hints = False
             self.hints_params = None
-
-        elif self.pushed_turn_button_first_time and not res5:
-            self.pushed_turn_button_first_time = False
-            self.turning_text = self.turning_font.render('Make move', True, 'white')
 
         if self.hand.can_add():  # можно ли добавить в руку карту если нет то нет смысла проверять колоду и магазин
             if res1[0]:
@@ -193,13 +200,7 @@ class Game:
                     self.is_showing_move_hints = False
                     self.hints_params = None
         elif res5 and not self.hand.chosen:
-            if self.pushed_turn_button_first_time:
-                self.flip_board()
-                self.pushed_turn_button_first_time = False
-                self.turning_text = self.turning_font.render('Make move', 1, 'white')
-            else:
-                self.turning_text = self.turning_font.render('Shure?', 1, 'white')
-                self.pushed_turn_button_first_time = True
+            self.flip_board()
 
     def is_game_over(self):
         return self.blue_heart.hp <= 0 or self.red_heart.hp <= 0 or self.time // 60 >= 5
@@ -223,20 +224,21 @@ class Game:
         self.field.update(all_sprites, screen, self.current_color)
 
     def turn_button_concerning(self, pos):
+        print(pos)
         x, y = pos
         offset = 10
-        text_pos = self.turning_text.get_rect()[2:]
-        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + text_pos[0] + offset and \
-            self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + text_pos[1] + offset
+        image_pos = self.turn_image.get_rect().size
+        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + image_pos[0] + offset and \
+            self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + image_pos[1] + offset
 
     def change_player(self):
         self.current_player = 1 if self.current_player == 2 else 2
-        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, 'black')
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, self.current_color)
 
     def flip_board(self):
-        self.change_player()
         self.field.flip()
         self.current_color = 'red' if self.current_color == 'blue' else 'blue'
+        self.change_player()
         self.hand.swap_hands(all_sprites)
         self.move_cnt += 1
         for i in range(self.field.goldmine_num(self.current_color)):
@@ -315,6 +317,7 @@ while running:
     game.update()
     all_sprites.draw(screen)
     all_sprites.update(game.current_color, screen)
+    game.store_prices()
     game.second_layer()
     pygame.display.flip()
     clock.tick(60)
