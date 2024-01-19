@@ -185,7 +185,7 @@ class Field:
         return self.field[cords[1]][cords[0]]
 
     def draw_move_hints(self, dist_range, cords, screen, color):
-        for i in range(-dist_range, dist_range + 1):
+        for i in range(dist_range + 1):
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
                 (self.cell_size, self.cell_size)), 2)

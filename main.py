@@ -92,10 +92,10 @@ class Game:
         pygame.draw.rect(screen, '#c3d657',
                          (9 * SCREEN_SCALE, 520 * SCREEN_SCALE, int(355 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
-                         (int(355 * SCREEN_SCALE) + 16 , 16 + int(508 * SCREEN_SCALE), int(117 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
+                         (int(355 * SCREEN_SCALE) + 16, 16 + int(508 * SCREEN_SCALE), int(117 * SCREEN_SCALE),
+                          int(95 * SCREEN_SCALE)))
         # screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
         #             (int(311), int(521)))
-
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
         screen.blit(text, (width - 115, 220))
@@ -186,8 +186,7 @@ class Game:
                     self.is_showing_move_hints = True
 
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
-                    a = [self.hints_params[1][1] + i for i in range(-self.hints_params[0], self.hints_params[0] + 1) if
-                         i != 0]
+                    a = [self.hints_params[1][1] - i for i in range(1, self.hints_params[0] + 1)]
                     if res4[1] in a and res4[0] in [self.hints_params[1][0] + i for i in
                                                     (-1, 0, 1)] and self.num_moved_heroes < self.num_can_move and \
                             self.hints_params[3] == self.current_color:
