@@ -42,7 +42,7 @@ class Hero(Piece):
 class Knight(Hero):
 
     def __init__(self, group, color='blue'):
-        super().__init__(group, color, 1, 1, 9, 3, 'knight')
+        super().__init__(group, color, 1, 1, 1, 3, 'knight')
 
 
 class Archer(Hero):

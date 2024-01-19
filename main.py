@@ -64,7 +64,7 @@ class Game:
         self.current_color = 'blue'
         self.num_taken_cards = 0
         self.num_moved_heroes = 0
-        self.num_can_move = 50
+        self.num_can_move = 2
         self.scores = {
             'blue': 0,
             'red': 0
