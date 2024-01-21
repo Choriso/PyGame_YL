@@ -1,82 +1,86 @@
+import os
+
 import pygame
 
+from consts import SCREEN_SCALE
+
 pygame.init()
-size = width, height = 450, 600
+size = width, height = 500, 700
 screen = pygame.display.set_mode(size)
 screen.fill('white')
 
 
 class Hand:
     def __init__(self):
-        self.blue_hand = []
-        self.red_hand = []
-        self.card_cnt = 0
+        self.pos_y = None
+        self.players = {
+            'blue': [[], 0],
+            'red': [[], 0],
+        }
         self.chosen = None
         self.font = pygame.font.SysFont('default', 30, italic=False, bold=False)
         self.current_color = 'blue'
+        self.stack_dict = None
 
     def update(self, surface):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
-        x = 2
+        hand = self.players[self.current_color][0]
+        x = 10
+        self.pos_y = int(530) * SCREEN_SCALE
         visited = []
         not_visited = {}
         pos = {}
+        k = 0
         for card in hand:
             if card.name not in visited:
                 card.rect.x = x
-                card.rect.y = 520
+                card.rect.y = self.pos_y
                 visited.append(card.name)
                 pos[card.name] = x
-                x += 36
+                x += int(55 * SCREEN_SCALE)
+                k += 1
             else:
                 if card.name in not_visited:
                     card.rect.x = not_visited[card.name][1]
-                    card.rect.y = 520
+                    card.rect.y = self.pos_y
                     not_visited[card.name][0] += 1
                 else:
                     card.rect.x = pos[card.name]
-                    card.rect.y = 520
+                    card.rect.y = self.pos_y
                     not_visited[card.name] = [2, pos[card.name]]
         if self.chosen:
-            self.chosen.rect.x = 315
-            self.chosen.rect.y = 525
-
-        font = pygame.font.SysFont('default', 30, italic=False, bold=False)
-        for cnt, x in not_visited.values():
-            text = font.render(f'X{cnt}', 1, "black")
-            surface.blit(text, (x + 20, 518))
+            self.chosen.rect.x = int(522)
+            self.chosen.rect.y = int(486)
+        self.stack_dict = not_visited
+        self.players[self.current_color][1] = k
 
     def add_card(self, card):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand = self.players[self.current_color][0]
         hand.append(card)
-        self.card_cnt += 1
         return True
 
     def can_add(self):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
-        return len(hand) <= 9
+        return self.players[self.current_color][1] <= 7
 
     def is_concerning(self, pos):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand = self.players[self.current_color][0]
         for i in range(len(hand)):
             if hand[i].rect.collidepoint(*pos):
                 return i
         return False
 
     def choose(self, ind):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand = self.players[self.current_color][0]
         if self.chosen:
             hand.append(self.chosen)
         self.chosen = hand.pop(ind)
-        self.card_cnt -= 1
 
     def add_sprites(self, group):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand = self.players[self.current_color][0]
         for card in hand:
             group.add(card)
 
     def remove_sprites(self, group):
-        hand = self.blue_hand if self.current_color == 'blue' else self.red_hand
+        hand = self.players[self.current_color][0]
         for card in hand:
             group.remove(card)
 
@@ -84,3 +88,11 @@ class Hand:
         self.remove_sprites(group)
         self.current_color = 'blue' if self.current_color == 'red' else 'red'
         self.add_sprites(group)
+
+    def draw_stack_text(self, surface):
+        if self.stack_dict:
+            fullname = os.path.join('data', "DungeonFont.ttf")
+            font = pygame.font.Font(fullname, int(19 * SCREEN_SCALE))
+            for cnt, x in self.stack_dict.values():
+                text = font.render(f'X{cnt}', True, "black")
+                surface.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))

@@ -3,8 +3,12 @@ import sys
 import random
 
 from CLASSES import CLASSES
-from heroes import Hero, Piece
+from consts import load_image, SCREEN_SCALE
+from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from heart import Heart
+
+
+size = width, height = 500, 700
 
 
 class Cell:
@@ -15,9 +19,9 @@ class Cell:
 
 class Field:
     def __init__(self, size, tilemap, bg_color):
-        self.left = 0
-        self.top = 0
-        self.cell_size = 17
+        self.left = 10
+        self.top = 10
+        self.cell_size = round(17 * SCREEN_SCALE)
         self.size = size
         self.bg_color = bg_color
         self.cells = [[Cell(x * self.cell_size, y * self.cell_size, tilemap.subsurface(
@@ -26,49 +30,66 @@ class Field:
         self.field = [[0] * size[0] for i in range(size[1])]
         self.is_drawing_hp = False
         self.drawing_hp_params = None
+        self.killed_by_blue = 0
+        self.killed_by_red = 0
 
     def draw(self, screen):
+
         # screen.fill(self.bg_color)
         for row in self.cells:
             for cell in row:
                 screen.blit(cell.image, cell.rect.move(self.left, self.top))
         self.draw_dashed_line(screen)
         if self.is_drawing_hp:
-            for i1, j1 in self.drawing_hp_params[3]:
-                self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+            for params in self.drawing_hp_params:
+                self.draw_hp(*params)
+        #scale = 7.49
+        #screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
+        #            (self.left, self.top))
 
     def draw_dashed_line(self, screen):
-        # Рисуем пунктирные линии
         dash_length = 10
         space_length = 7
-        for x in range(self.cell_size, 515, self.cell_size):
-            for y in range(space_length // 2, 515, dash_length + space_length):
-                if x < 360 - dash_length:
+
+        # Draw vertical dashed lines
+        for x in range(self.cell_size, (self.size[0] + 1) * self.cell_size, self.cell_size):
+            for y in range(space_length // 2, self.size[1] * self.cell_size, dash_length + space_length):
+                if x < self.size[0] * self.cell_size:
                     pygame.draw.line(screen, (0, 0, 0), (x + self.left, y + self.top),
                                      (x + self.left, y + dash_length + self.top))
-                if y < 360 - dash_length:
-                    pygame.draw.line(screen, (0, 0, 0), (y + self.left, x + self.top),
-                                     (y + dash_length + self.left, x + self.top))
 
-    def update(self, group, screen):
+        # Draw horizontal dashed lines
+        for y in range(self.cell_size, (self.size[1] + 1) * self.cell_size, self.cell_size):
+            for x in range(space_length // 2, self.size[0] * self.cell_size, dash_length + space_length):
+                if y < self.size[1] * self.cell_size:
+                    pygame.draw.line(screen, (0, 0, 0), (x + self.left, y + self.top),
+                                     (x + dash_length + self.left, y + self.top))
+
+    def update(self, group, screen, current_color):
         def fight(i, j, hero, piece):
             f = False
+            if isinstance(piece, tuple):
+                piece = piece[1]
             if isinstance(piece, Piece) and piece.color != hero.color:
                 piece.beat(hero.damage)
                 f = True
                 res = piece.is_alive()
                 if self.is_drawing_hp:
-                    self.drawing_hp_params[3].append(
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                    self.drawing_hp_params.append((piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                    j * self.cell_size + self.left)))
                 else:
                     self.is_drawing_hp = True
-                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+                    self.drawing_hp_params = [(piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                j * self.cell_size + self.left))]
 
-                for i1, j1 in self.drawing_hp_params[3]:
-                    self.draw_hp(*self.drawing_hp_params[:3], (i1, j1))
+                for params in self.drawing_hp_params:
+                    self.draw_hp(*params)
 
                 if not res:
+                    if hero.color == 'blue':
+                        self.killed_by_blue += 1
+                    elif hero.color == 'red':
+                        self.killed_by_red += 1
                     group.remove(piece)
                     cords_to_remove.append((i + x, j))
 
@@ -76,12 +97,12 @@ class Field:
                 piece.beat(hero.damage)
                 f = True
                 if self.is_drawing_hp:
-                    self.drawing_hp_params[3].append(
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left))
+                    self.drawing_hp_params.append((piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                    j * self.cell_size + self.left)))
                 else:
                     self.is_drawing_hp = True
-                    self.drawing_hp_params = piece.hp, piece.max_hp, screen, [
-                        ((i + x) * self.cell_size + self.top, j * self.cell_size + self.left)]
+                    self.drawing_hp_params = [(piece.hp, piece.max_hp, screen, ((i + x) * self.cell_size + self.top,
+                                                                                j * self.cell_size + self.left))]
 
             return f
 
@@ -91,11 +112,10 @@ class Field:
 
             for j in range(self.size[0]):
 
-                if isinstance(self.field[i][j], Hero):
+                if isinstance(self.field[i][j], Hero) or isinstance(self.field[i][j], Ballista):
                     hero = self.field[i][j]
-
                     for x in range(hero.attack_range + 1):
-                        x = -x if hero.color == 'blue' else x
+                        x = -x if hero.color == current_color else x
 
                         if self.size[1] > i + x >= 0:
                             piece = self.field[i + x][j]
@@ -107,8 +127,29 @@ class Field:
                                         piece = self.field[i + x][j + a]
                                         fight(i, j + a, hero, piece)
 
+                elif isinstance(self.field[i][j], Bomb) and self.field[i][j].ready:
+                    bomb = self.field[i][j]
+                    for y in (-1, 0, 1):
+                        for x in (-1, 0, 1):
+                            if (x or y) and self.size[1] > i + y >= 0 and self.size[0] > j + x >= 0:
+                                fight(i + y, j + x, bomb, self.field[i + y][j + x])
+                    group.remove(bomb)
+                    cords_to_remove.append((i, j))
+                elif isinstance(self.field[i][j], tuple) and isinstance(self.field[i][j][0], Freeze) and not \
+                        self.field[i][j][0].is_active:
+                    freeze, self.field[i][j] = self.field[i][j]
+                    group.remove(freeze)
+
         for i, j in cords_to_remove:
-            self.field[i][j] = 0
+            if not isinstance(self.field[i][j], tuple):
+                self.field[i][j] = 0
+            else:
+                self.field[i][j] = self.field[i][j][0], 0
+
+    def killed_num(self):
+        k1, k2 = self.killed_by_red, self.killed_by_blue
+        self.killed_by_red, self.killed_by_blue = 0, 0
+        return k1, k2
 
     def get_click(self, mouse_pos):
         cell = self.get_cell(mouse_pos)
@@ -122,19 +163,29 @@ class Field:
         return cell_x, cell_y
 
     def on_click(self, cell_coords, group, card, color):
-        if self.field[cell_coords[1]][cell_coords[0]]:
+        if cell_coords[1] >= self.size[1] // 2:
+            hero = card.link(group, color=color)
+            if isinstance(hero, Freeze):
+                self.field[cell_coords[1]][cell_coords[0]] = hero, self.field[cell_coords[1]][cell_coords[0]]
+                hero.rect.x = cell_coords[0] * self.cell_size + self.left
+                hero.rect.y = cell_coords[1] * self.cell_size + self.top
+                return hero
+            else:
+                if self.field[cell_coords[1]][cell_coords[0]]:
+                    group.remove(hero)
+                    return False
+                self.field[cell_coords[1]][cell_coords[0]] = hero
+                hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
+                hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
+                return hero
+        else:
             return False
-        hero = card.link(group, color=color)
-        self.field[cell_coords[1]][cell_coords[0]] = hero
-        hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
-        hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
-        return True
 
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
 
     def draw_move_hints(self, dist_range, cords, screen, color):
-        for i in range(-dist_range, dist_range + 1):
+        for i in range(dist_range + 1):
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
                 (self.cell_size, self.cell_size)), 2)
@@ -150,20 +201,25 @@ class Field:
                 start_pos[1]]
             hero.rect.y -= (start_pos[0] - end_pos[0]) * self.cell_size
             hero.rect.x -= (start_pos[1] - end_pos[1]) * self.cell_size
+            return True
+        return False
 
-    def add_piece(self, hero, cords):
-        self.field[cords[0]][cords[1]] = hero
-        hero.rect.x = cords[1] * self.cell_size + self.left
-        hero.rect.y = cords[0] * self.cell_size + self.top
+    def add_piece(self, hero, field_cords):
+        if isinstance(hero, Freeze):
+            self.field[field_cords[0]][field_cords[1]] = (hero, self.field[field_cords[0]][field_cords[1]])
+        else:
+            self.field[field_cords[0]][field_cords[1]] = hero
+        hero.rect.x = field_cords[1] * self.cell_size + self.left
+        hero.rect.y = field_cords[0] * self.cell_size + self.top
 
     def draw_hp(self, hp, max_hp, screen, hero_cords):
         y, x = hero_cords
         if y - 5 < 0:
-            pygame.draw.rect(screen, 'black', ((x, y + 13), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y + 13), (17 * SCREEN_SCALE, 4  * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp  * SCREEN_SCALE), 4 * SCREEN_SCALE)))
         else:
-            pygame.draw.rect(screen, 'black', ((x, y - 5), (17, 4)))
-            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp), 4)))
+            pygame.draw.rect(screen, 'black', ((x, y - 5), (17 * SCREEN_SCALE, 4 * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp * SCREEN_SCALE), 4 * SCREEN_SCALE)))
 
     def flip(self):
         self.field = self.field[::-1]
@@ -176,26 +232,35 @@ class Field:
             for j in range(self.size[0]):
                 if self.field[i][j]:
                     piece = self.field[i][j]
-                    piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
-                    if isinstance(piece, Hero):
-                        piece.change_state_and_image()
+                    if isinstance(piece, tuple):
+                        piece[0].rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                        if piece[1]:
+                            piece[1].rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                            if isinstance(piece[1], Piece):
+                                piece[1].change_state_and_image()
+                    else:
+                        piece.rect.y -= (self.size[1] - 2 * i - 1) * self.cell_size
+                        if isinstance(piece, Piece):
+                            piece.change_state_and_image()
 
+    def goldmine_num(self, color):
+        k = 0
+        for i in self.field:
+            for piece in i:
+                if isinstance(piece, GoldMine) and piece.color == color:
+                    k += 1
+        return k
 
 
 def main():
     pygame.init()
+    print()
     screen = pygame.display.set_mode((800, 600))
-    tilemap = pygame.image.load('data\TexturedGrass.png')  # Загрузите ваш tilemap здесь
-    interface = Interface(screen, tilemap, 100)
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                interface.click(event.pos)
-
-        interface.draw()
         pygame.display.flip()
 
 
