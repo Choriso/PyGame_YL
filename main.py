@@ -3,15 +3,15 @@ import os
 import pygame
 
 from consts import load_image, SCREEN_SCALE, CARD_SIZE, COIN_SIZE
-from store import Store
-from card_cl import Deck
-from goldcoin import GoldCoin
-from hand import Hand
-from startscreen import StartScreen
-from field import Field
-from heart import Heart
-from heroes import Hero, Spell
-from endscreen import end_screen
+from game.store import Store
+from game.cards import Deck
+from game.goldcoin import GoldCoin
+from game.hand import Hand
+from screens.startscreen import StartScreen
+from game.field import Field
+from game.heart import Heart
+from game.heroes import Hero, Spell
+from screens.endscreen import end_screen
 
 pygame.init()
 size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE

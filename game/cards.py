@@ -1,7 +1,7 @@
 import pygame
 from random import choice
 from consts import CARD_IMAGES, load_image, SCREEN_SCALE, CARD_SIZE
-from CLASSES import CLASSES
+from game.heroes import CLASSES
 
 pygame.init()
 size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
@@ -27,7 +27,7 @@ class Deck(pygame.sprite.Sprite):
     def __init__(self, group, cords, cur_card='knight'):
         super().__init__(group)
         self.group = group
-        self.image = pygame.transform.scale(load_image(Deck.image),CARD_SIZE)
+        self.image = pygame.transform.scale(load_image(Deck.image), CARD_SIZE)
         self.rect = self.image.get_rect()
 
         self.rect.x,  self.rect.y = cords

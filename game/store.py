@@ -1,7 +1,7 @@
 import os
 
 import pygame
-from card_cl import Card
+from game.cards import Card
 from random import choice
 from consts import PRICES, SCREEN_SCALE
 

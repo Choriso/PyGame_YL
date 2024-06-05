@@ -1,5 +1,5 @@
 import sqlite3
-import os
+
 
 class Player:
     def __init__(self, name, password):
@@ -8,7 +8,7 @@ class Player:
         self.score = 0
 
     def save_to_database(self):
-        conn = sqlite3.connect('player_data.db')
+        conn = sqlite3.connect('db/player_data.db')
         cursor = conn.cursor()
 
         cursor.execute('''
@@ -40,7 +40,7 @@ class Player:
 
     @classmethod
     def load_from_database(cls, name):
-        conn = sqlite3.connect('player_data.db')
+        conn = sqlite3.connect('db/player_data.db')
         cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM players WHERE name=?', (name,))
@@ -55,7 +55,7 @@ class Player:
 
     @classmethod
     def get_all_players(cls):
-        conn = sqlite3.connect('player_data.db')
+        conn = sqlite3.connect('db/player_data.db')
         cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM players')
@@ -68,7 +68,7 @@ class Player:
 
     @classmethod
     def check_credentials(cls, name, password):
-        conn = sqlite3.connect('player_data.db')
+        conn = sqlite3.connect('db/player_data.db')
         cursor = conn.cursor()
 
         cursor.execute('SELECT * FROM players WHERE name=? AND password=?', (name, password))

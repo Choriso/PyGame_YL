@@ -2,10 +2,9 @@ import pygame
 import sys
 import random
 
-from CLASSES import CLASSES
-from consts import load_image, SCREEN_SCALE
-from heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
-from heart import Heart
+from consts import SCREEN_SCALE
+from game.heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
+from game.heart import Heart
 
 
 size = width, height = 500, 700
