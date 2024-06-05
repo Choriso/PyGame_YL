@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from consts import load_image, SCREEN_SCALE
+from consts import load_image, SCREEN_SCALE, CARD_SIZE, COIN_SIZE
 from store import Store
 from card_cl import Deck
 from goldcoin import GoldCoin
@@ -14,7 +14,7 @@ from heroes import Hero, Spell
 from endscreen import end_screen
 
 pygame.init()
-size = width, height = 500 * 1.3, 620 * 1.3
+size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
 start_screen_size = (800, 600)
 
 screen = pygame.display.set_mode(size)
@@ -26,20 +26,26 @@ pygame.display.set_caption('Stratego')
 
 class Game:
     def __init__(self):
+        self.table_cords = self.table_cords = width * 0.75, height * 0.017
+        self.table_size = int(width * 0.235), int(height * 0.815)
+        self.turn_image = None
+        self.turning_button_cords = None
         self.player_names = {
             1: start_screen.player_1_name,
             2: start_screen.player_2_name
         }
 
+        store_cords, self.time_cords, deck_cords, gold_cords, self.cur_card_cords = self.calculate_cords()
+
         # создаются экземпляры классов
-        self.goldCoin = GoldCoin(all_sprites)
-        self.deck = Deck(all_sprites)
-        self.store = Store()
-        self.hand = Hand()
+        self.goldCoin = GoldCoin(all_sprites, gold_cords)
+        self.deck = Deck(all_sprites, deck_cords)
+        self.store = Store(store_cords)
+        self.hand = Hand(self.cur_card_cords)
 
-        tilemap = pygame.image.load('data/TexturedGrass.png')
+        tile_map = pygame.image.load('data/TexturedGrass.png')
 
-        self.field = Field((21, 30), tilemap, 'white')
+        self.field = Field((21, 30), tile_map, 'white')
 
         self.blue_heart = Heart(all_sprites, 'blue')
         self.field.add_piece(self.blue_heart, (self.field.size[1] - 1, self.field.size[0] // 2))
@@ -60,7 +66,8 @@ class Game:
         fullname = os.path.join('data', "Cunia.otf")
         self.player_font = pygame.font.Font(fullname, int(17 * SCREEN_SCALE))
         self.current_player = 1
-        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, self.current_color)
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', True,
+                                                   self.current_color)
 
         self.num_taken_cards = 0
         self.num_moved_heroes = 0
@@ -71,7 +78,24 @@ class Game:
         }
 
         self.time = 0
-        self.time_font = pygame.font.SysFont('default', 30, bold=True)
+        self.time_font = pygame.font.SysFont('default', int(32 * SCREEN_SCALE), bold=False)
+
+    def calculate_cords(self):
+        gap = (0.83 * self.table_size[1] - 277 * SCREEN_SCALE) / 5
+        table_width, table_height = self.table_size
+        x, y = self.table_cords
+
+        store_cords = {1: (x + int(table_width * 0.05), y + int(table_height * 0.02)),
+                       2: (x + int(table_width * 0.05), y + int(table_height * 0.17)),
+                       3: (x + int(table_width * 0.53), y + int(table_height * 0.02)),
+                       4: (x + int(table_width * 0.53), y + int(table_height * 0.17))}
+
+        time_cords = (int(self.table_cords[0] + (int(32 * SCREEN_SCALE / 0.75281 * 4.14) - self.table_size[0]) // 2),
+                      CARD_SIZE[1] + store_cords[2][1] + gap)
+        deck_cords = (int(x + table_width * 0.28), time_cords[1] + 16 + gap)
+        gold_cords = (int(x + table_width * 0.24), deck_cords[1] + CARD_SIZE[1] + gap)
+        cur_card_cords = (int(x + (table_width - CARD_SIZE[0]) / 2), gold_cords[1] + COIN_SIZE[1] + gap)
+        return store_cords, time_cords, deck_cords, gold_cords, cur_card_cords
 
     def update(self):  # вызываются методы update или draw и рисуются нужные вещи и линии
         res = self.is_game_over()
@@ -84,36 +108,37 @@ class Game:
             self.game_over(winner)
         # res = self.game_is_continue()
         bg_size = 850
+
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
-        pygame.draw.rect(screen, '#c3d657',
-                         (367 * SCREEN_SCALE, 8 * SCREEN_SCALE, int(117 * SCREEN_SCALE), int(508 * SCREEN_SCALE)))
+        pygame.draw.rect(screen, '#c3d657', (self.table_cords, self.table_size))
+
         pygame.draw.rect(screen, '#8ecd65',
-                         (397 * SCREEN_SCALE, 370 * SCREEN_SCALE, int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
+                         ((self.cur_card_cords[0] - 5 * SCREEN_SCALE), (self.cur_card_cords[1] - 5 * SCREEN_SCALE), int(60 * SCREEN_SCALE),
+                          int(75 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
                          (9 * SCREEN_SCALE, 520 * SCREEN_SCALE, int(355 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
                          (int(355 * SCREEN_SCALE) + 16, 16 + int(508 * SCREEN_SCALE), int(117 * SCREEN_SCALE),
                           int(95 * SCREEN_SCALE)))
-        # screen.blit(pygame.transform.scale(load_image("BG_card_choose.png"), (int(25 * scale), int(30 * scale))),
-        #             (int(311), int(521)))
 
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
-        screen.blit(text, (width - 115, 220))
 
-        # pygame.draw.rect(screen, 'red', ((311, 521), (39, 49)), 5)
-        # pygame.draw.rect(screen, 'black', ((370, 490), (75, 22)), 2)
-
+        screen.blit(text, self.time_cords)
+        # int(32 * SCREEN_SCALE / 0.75281) * 4.2 - это ширина всего таймера,
+        # где 32 * SCREEN_SCALE это текущий размер шрифта таймера,
+        # / 0.75281 это перевод кегля(пункта) в пиксели, а *4.14 это я хотел изначально измерить количество,
+        # так как двоеточие это примерно пятая часть цифры, но по итогу ошибся где то
         fullname = os.path.join('data', "Cunia.otf")
         turn_font = pygame.font.Font(fullname, int(9 * SCREEN_SCALE))
-        turn_text = turn_font.render("Закончить ход", 1, "white")
+        turn_text = turn_font.render("Закончить ход", True, "white")
 
-        self.turning_button_coords = (538, 710)
-        self.turn_image = pygame.transform.scale(load_image("Redo.png"), (27 * SCREEN_SCALE, 29 * SCREEN_SCALE))
-        screen.blit(self.turn_image, self.turning_button_coords)
-        screen.blit(turn_text, (self.turning_button_coords[0] - 31, self.turning_button_coords[1] + 42))
+        self.turning_button_cords = (width * 0.84, height * 0.89)
+        self.turn_image = pygame.transform.scale(load_image("Redo.png"), (30 * SCREEN_SCALE, 31 * SCREEN_SCALE))
+        screen.blit(self.turn_image, self.turning_button_cords)
+        screen.blit(turn_text, (self.turning_button_cords[0] - 31, self.turning_button_cords[1] + 42))
 
         self.field.draw(screen)
-        screen.blit(self.player_text, (width - 140, height - 200))
+        screen.blit(self.player_text, (width * 0.795, height * 0.85))
         self.hand.update(screen)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
             self.field.draw_move_hints(*self.hints_params)
@@ -142,10 +167,10 @@ class Game:
         res4 = self.field.get_click(pos)
         res5 = self.turn_button_concerning(pos)
 
-        # проверяет стоит ли убирать подсказки для хода
+        # проверяет, стоит ли убирать подсказки для хода
         if self.is_showing_move_hints and not res4:
             self.is_showing_move_hints = False
-            self.hints_params = None
+            self.hints_params = ()
 
         if self.hand.can_add():  # можно ли добавить в руку карту если нет то нет смысла проверять колоду и магазин
             if res1[0]:
@@ -168,19 +193,19 @@ class Game:
             self.hand.choose(res3)
         elif res4:
             result = False
-            if self.hand.chosen:  # если выбрана то поставить на поле
+            if self.hand.chosen:  # если выбрана, то поставить на поле
                 result = self.field.on_click(res4, all_sprites, self.hand.chosen, self.current_color)
                 if result and isinstance(result, Spell):
-                    event = events[result.name][0]
-                    event.spell = result
-                    pygame.time.set_timer(event, events[result.name][1])
+                    cur_event = events[result.name][0]
+                    cur_event.spell = result
+                    pygame.time.set_timer(cur_event, events[result.name][1])
                 if result:
                     all_sprites.remove(self.hand.chosen)
                     self.hand.chosen = None
             if result is False:  # в другом случае или если не поставилась карта
                 hero = self.field.get_piece(res4)
                 if isinstance(hero,
-                              Hero) and hero.color == self.current_color:  # если нажали на героя то рисуются подсказки для хода
+                              Hero) and hero.color == self.current_color:  # если нажали на героя - показываются ходы
                     self.hints_params = hero.dist_range, res4, screen, hero.color
                     self.field.draw_move_hints(*self.hints_params)
                     self.is_showing_move_hints = True
@@ -212,10 +237,10 @@ class Game:
 
     def game_over(self, winner):
         num = 1 if winner == 'blue' else 2
-        event = events['new game']
-        event.score = self.scores[winner]
-        event.winner = self.player_names[num]
-        pygame.event.post(event)
+        cur_event = events['new game']
+        cur_event.score = self.scores[winner]
+        cur_event.winner = self.player_names[num]
+        pygame.event.post(cur_event)
 
     def attack_update(self):
         self.field.is_drawing_hp = False
@@ -227,12 +252,13 @@ class Game:
         x, y = pos
         offset = 10
         image_pos = self.turn_image.get_rect().size
-        return self.turning_button_coords[0] - offset <= x <= self.turning_button_coords[0] + image_pos[0] + offset and \
-            self.turning_button_coords[1] - offset <= y <= self.turning_button_coords[1] + image_pos[1] + offset
+        return self.turning_button_cords[0] - offset <= x <= self.turning_button_cords[0] + image_pos[0] + offset and \
+            self.turning_button_cords[1] - offset <= y <= self.turning_button_cords[1] + image_pos[1] + offset
 
     def change_player(self):
         self.current_player = 1 if self.current_player == 2 else 2
-        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', 1, self.current_color)
+        self.player_text = self.player_font.render(f'{self.player_names[self.current_player]}', True,
+                                                   self.current_color)
 
     def flip_board(self):
         self.field.flip()
@@ -248,10 +274,12 @@ class Game:
     def second_layer(self):
         self.hand.draw_stack_text(screen)
 
-    def bomb(self, spell):
+    @staticmethod
+    def bomb(spell):
         spell.switch_ready()
 
-    def freeze(self, spell):
+    @staticmethod
+    def freeze(spell):
         spell.switch_active()
 
     def give_coin(self, num):

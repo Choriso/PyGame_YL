@@ -5,13 +5,14 @@ import pygame
 from consts import SCREEN_SCALE
 
 pygame.init()
-size = width, height = 500, 700
+size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
 screen = pygame.display.set_mode(size)
 screen.fill('white')
 
 
 class Hand:
-    def __init__(self):
+    def __init__(self, cords):
+        self.cur_card_cords = cords
         self.pos_y = None
         self.players = {
             'blue': [[], 0],
@@ -48,8 +49,7 @@ class Hand:
                     card.rect.y = self.pos_y
                     not_visited[card.name] = [2, pos[card.name]]
         if self.chosen:
-            self.chosen.rect.x = int(522)
-            self.chosen.rect.y = int(486)
+            self.chosen.rect.x, self.chosen.rect.y = self.cur_card_cords
         self.stack_dict = not_visited
         self.players[self.current_color][1] = k
 

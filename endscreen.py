@@ -3,11 +3,11 @@ import sys
 import pygame
 import pygame_gui
 
-from consts import load_image
+from consts import load_image, SCREEN_SCALE
 
 
 def end_screen(score, winner):
-    size = width, height = 500, 700
+    size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
     screen = pygame.display.set_mode(size)
     manager = pygame_gui.UIManager((width, height))
 

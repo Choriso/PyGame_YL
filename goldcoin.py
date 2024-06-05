@@ -1,34 +1,42 @@
 import os
 
 import pygame
-from consts import load_image, SCREEN_SCALE
+from consts import load_image, SCREEN_SCALE, COIN_SIZE
 
 pygame.init()
-size = width, height = 500, 700
+size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
 screen = pygame.display.set_mode(size)
 # screen.fill('white')
 all_sprites = pygame.sprite.Group()
 
-class GoldCoin(pygame.sprite.Sprite):
-    image = pygame.transform.scale(load_image('gold.png'), (50 * SCREEN_SCALE, 50 * SCREEN_SCALE))
 
-    def __init__(self, group):
+class GoldCoin(pygame.sprite.Sprite):
+    image = pygame.transform.scale(load_image('gold.png'), COIN_SIZE)
+
+    def __init__(self, group, cords):
         super().__init__(group)
         self.image = GoldCoin.image
         self.rect = self.image.get_rect()
-        self.rect.x = int(408 * SCREEN_SCALE)
-        self.rect.y = int(300 * SCREEN_SCALE)
-        self.golds = {'blue': 5, 'red': 4}
-        # self.blue_gold = 5
-        # self.red_gold = 4
-        self.gold_to_pos = {1: (int(self.rect.x + 23), int(self.rect.y + 13)), 2: (int(self.rect.x + 20), int(self.rect.y + 20))}  # change
+        print(self.rect)
+        self.rect.x, self.rect.y = cords
+        self.golds = {'blue': 111, 'red': 4}
+
+    def gold_to_params(self, gold):
+        font = int(32 * SCREEN_SCALE)
+        match len(str(gold)):
+            case 3:
+                return (self.rect.x + COIN_SIZE[0] / 2 - font / 2, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
+            case 2:
+                return (self.rect.x + COIN_SIZE[0] / 2 - font / 3, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
+            case 1:
+                return (self.rect.x + COIN_SIZE[0] / 2 - font / 5, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
 
     def update(self, color, surface):
         gold = self.golds[color]
+        pos, font_size = self.gold_to_params(gold)
         fullname = os.path.join('data', "DungeonFont.ttf")
-        font = pygame.font.Font(fullname, int(32 * SCREEN_SCALE))
-        text = font.render(f'{gold}', 1, "#895404")
-        pos = self.gold_to_pos[len(str(gold))]
+        font = pygame.font.Font(fullname, font_size)
+        text = font.render(f'{gold}', True, "#895404")
         surface.blit(text, pos)
 
     def buy(self, price, color):

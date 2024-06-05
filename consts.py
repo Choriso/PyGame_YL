@@ -27,7 +27,11 @@ def load_image(name, colorkey=None):
     return image
 
 
-SCREEN_SCALE = 1.3
+SCREEN_SCALE = 1
+CARD_SIZE = (int(51 * SCREEN_SCALE), int(68 * SCREEN_SCALE))
+COIN_SIZE = (60 * SCREEN_SCALE, 60 * SCREEN_SCALE)
+# deck_cords = (x + table_width * 0.28, time_cords[1] + SCREEN_SCALE * 42.7 + gap)
+# int(self.table_cords[0] + (int(32 * SCREEN_SCALE / 0.75281 * 4.14) - self.table_size[0]) // 2)
 CARD_IMAGES = {
     'knight': 'Пехота.png',
     'archer': "Лучник.png",
