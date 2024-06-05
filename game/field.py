@@ -6,7 +6,6 @@ from consts import SCREEN_SCALE
 from game.heroes import Hero, Piece, Ballista, Bomb, Freeze, GoldMine
 from game.heart import Heart
 
-
 size = width, height = 500, 700
 
 
@@ -17,16 +16,16 @@ class Cell:
 
 
 class Field:
-    def __init__(self, size, tilemap, bg_color):
+    def __init__(self, field_size, tilemap, bg_color):
         self.left = 10
         self.top = 10
         self.cell_size = round(17 * SCREEN_SCALE)
-        self.size = size
+        self.size = field_size
         self.bg_color = bg_color
         self.cells = [[Cell(x * self.cell_size, y * self.cell_size, tilemap.subsurface(
             pygame.Rect(random.randrange(0, tilemap.get_width(), 16), random.randrange(0, tilemap.get_height(), 16), 16,
-                        16)), self.cell_size) for x in range(size[0])] for y in range(size[1])]
-        self.field = [[0] * size[0] for i in range(size[1])]
+                        16)), self.cell_size) for x in range(field_size[0])] for y in range(field_size[1])]
+        self.field: list[list[int | Piece | tuple | Hero]] = [[0] * field_size[0] for _ in range(field_size[1])]
         self.is_drawing_hp = False
         self.drawing_hp_params = None
         self.killed_by_blue = 0
@@ -42,9 +41,6 @@ class Field:
         if self.is_drawing_hp:
             for params in self.drawing_hp_params:
                 self.draw_hp(*params)
-        #scale = 7.49
-        #screen.blit(pygame.transform.scale(load_image("Field_around.png"), (int(48 * scale * width_scale), int(68 * scale * height_scale))),
-        #            (self.left, self.top))
 
     def draw_dashed_line(self, screen):
         dash_length = 10
@@ -183,7 +179,7 @@ class Field:
     def get_piece(self, cords):
         return self.field[cords[1]][cords[0]]
 
-    def draw_move_hints(self, dist_range, cords, screen, color):
+    def draw_move_hints(self, dist_range, cords, screen):
         for i in range(dist_range + 1):
             pygame.draw.rect(screen, 'cyan', (
                 (cords[0] * self.cell_size + self.left, (cords[1] - i) * self.cell_size + self.top),
@@ -211,11 +207,12 @@ class Field:
         hero.rect.x = field_cords[1] * self.cell_size + self.left
         hero.rect.y = field_cords[0] * self.cell_size + self.top
 
-    def draw_hp(self, hp, max_hp, screen, hero_cords):
+    @staticmethod
+    def draw_hp(hp, max_hp, screen, hero_cords):
         y, x = hero_cords
         if y - 5 < 0:
-            pygame.draw.rect(screen, 'black', ((x, y + 13), (17 * SCREEN_SCALE, 4  * SCREEN_SCALE)))
-            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp  * SCREEN_SCALE), 4 * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'black', ((x, y + 13), (17 * SCREEN_SCALE, 4 * SCREEN_SCALE)))
+            pygame.draw.rect(screen, 'red', ((x, y + 13), (int(17 * hp / max_hp * SCREEN_SCALE), 4 * SCREEN_SCALE)))
         else:
             pygame.draw.rect(screen, 'black', ((x, y - 5), (17 * SCREEN_SCALE, 4 * SCREEN_SCALE)))
             pygame.draw.rect(screen, 'red', ((x, y - 5), (int(17 * hp / max_hp * SCREEN_SCALE), 4 * SCREEN_SCALE)))
@@ -254,7 +251,6 @@ class Field:
 def main():
     pygame.init()
     print()
-    screen = pygame.display.set_mode((800, 600))
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

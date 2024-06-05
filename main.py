@@ -3,14 +3,16 @@ import os
 import pygame
 
 from consts import load_image, SCREEN_SCALE, CARD_SIZE, COIN_SIZE
+
 from game.store import Store
 from game.cards import Deck
 from game.goldcoin import GoldCoin
 from game.hand import Hand
-from screens.startscreen import StartScreen
 from game.field import Field
 from game.heart import Heart
 from game.heroes import Hero, Spell
+
+from screens.startscreen import StartScreen
 from screens.endscreen import end_screen
 
 pygame.init()
@@ -113,8 +115,8 @@ class Game:
         pygame.draw.rect(screen, '#c3d657', (self.table_cords, self.table_size))
 
         pygame.draw.rect(screen, '#8ecd65',
-                         ((self.cur_card_cords[0] - 5 * SCREEN_SCALE), (self.cur_card_cords[1] - 5 * SCREEN_SCALE), int(60 * SCREEN_SCALE),
-                          int(75 * SCREEN_SCALE)))
+                         ((self.cur_card_cords[0] - 5 * SCREEN_SCALE), (self.cur_card_cords[1] - 5 * SCREEN_SCALE),
+                          int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
                          (9 * SCREEN_SCALE, 520 * SCREEN_SCALE, int(355 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
