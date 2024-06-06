@@ -19,7 +19,7 @@ class GoldCoin(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         print(self.rect)
         self.rect.x, self.rect.y = cords
-        self.golds = {'blue': 111, 'red': 4}
+        self.golds = {'blue': 1, 'red': 4}
 
     def gold_to_params(self, gold):
         font = int(32 * SCREEN_SCALE)
@@ -29,7 +29,7 @@ class GoldCoin(pygame.sprite.Sprite):
             case 2:
                 return (self.rect.x + COIN_SIZE[0] / 2 - font / 3, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
             case 1:
-                return (self.rect.x + COIN_SIZE[0] / 2 - font / 5, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
+                return (self.rect.x + COIN_SIZE[0] / 2 - font / 6, (self.rect.y + COIN_SIZE[1] / 2 - font / 2)), font
 
     def update(self, color, surface):
         gold = self.golds[color]

@@ -13,7 +13,7 @@ from game.heart import Heart
 from game.heroes import Hero, Spell
 
 from screens.startscreen import StartScreen
-from screens.endscreen import end_screen
+from screens.endscreen import EndScreen
 
 pygame.init()
 size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
@@ -143,7 +143,7 @@ class Game:
         screen.blit(self.player_text, (width * 0.795, height * 0.85))
         self.hand.update(screen)
         if self.is_showing_move_hints:  # если показываются подсказки - показывать дальше
-            self.field.draw_move_hints(*self.hints_params)
+            self.field.draw_move_hints(*self.hints_params[:-1])
 
         k1, k2 = self.field.killed_num()
         self.goldCoin.golds['red'] += k1
@@ -209,7 +209,7 @@ class Game:
                 if isinstance(hero,
                               Hero) and hero.color == self.current_color:  # если нажали на героя - показываются ходы
                     self.hints_params = hero.dist_range, res4, screen, hero.color
-                    self.field.draw_move_hints(*self.hints_params)
+                    self.field.draw_move_hints(*self.hints_params[:-1])
                     self.is_showing_move_hints = True
 
                 elif self.is_showing_move_hints:  # если показываются подсказки проверка на ход или убрать подсказки
@@ -294,6 +294,8 @@ start_screen.run()
 
 game = Game()
 
+end_screen = EndScreen()
+
 ATTACKEVENT = pygame.event.Event(pygame.event.custom_type())
 pygame.time.set_timer(ATTACKEVENT, 1800)
 
@@ -332,16 +334,12 @@ while running:
             game.time += 1
         elif event.type == events['new game'].type:
 
-            end_screen(event.score, event.winner)
+            end_screen.run(event.score, event.winner)
             screen = pygame.display.set_mode(start_screen_size)
             all_sprites = pygame.sprite.Group()
             game = Game()
             start_screen.run()
             clock = pygame.time.Clock()
-        # for spell_name, value in events.values():
-        #     if event.type == value[1]:
-        #         game.spell_event(spell_name)
-
     screen.fill((100, 100, 100))
     game.update()
     all_sprites.draw(screen)
