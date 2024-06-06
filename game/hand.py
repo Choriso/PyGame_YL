@@ -6,8 +6,8 @@ from consts import SCREEN_SCALE
 
 pygame.init()
 size = width, height = 500 * SCREEN_SCALE, 620 * SCREEN_SCALE
-screen = pygame.display.set_mode(size)
-screen.fill('white')
+surface = pygame.display.set_mode(size)
+surface.fill('white')
 
 
 class Hand:
@@ -23,7 +23,7 @@ class Hand:
         self.current_color = 'blue'
         self.stack_dict = None
 
-    def update(self, surface):
+    def update(self, screen):
         hand = self.players[self.current_color][0]
         x = 10
         self.pos_y = int(530) * SCREEN_SCALE
@@ -52,6 +52,10 @@ class Hand:
             self.chosen.rect.x, self.chosen.rect.y = self.cur_card_cords
         self.stack_dict = not_visited
         self.players[self.current_color][1] = k
+
+        pygame.draw.rect(screen, '#8ecd65',
+                         ((self.cur_card_cords[0] - 5 * SCREEN_SCALE), (self.cur_card_cords[1] - 5 * SCREEN_SCALE),
+                          int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
 
     def add_card(self, card):
         hand = self.players[self.current_color][0]
@@ -89,10 +93,10 @@ class Hand:
         self.current_color = 'blue' if self.current_color == 'red' else 'red'
         self.add_sprites(group)
 
-    def draw_stack_text(self, surface):
+    def draw_stack_text(self, screen):
         if self.stack_dict:
             fullname = os.path.join('data', "DungeonFont.ttf")
             font = pygame.font.Font(fullname, int(19 * SCREEN_SCALE))
             for cnt, x in self.stack_dict.values():
                 text = font.render(f'X{cnt}', True, "black")
-                surface.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))
+                screen.blit(text, (int(((x - 5) * SCREEN_SCALE)), self.pos_y))

@@ -11,6 +11,7 @@ from game.hand import Hand
 from game.field import Field
 from game.heart import Heart
 from game.heroes import Hero, Spell
+from game.timer import Timer
 
 from screens.startscreen import StartScreen
 from screens.endscreen import EndScreen
@@ -37,13 +38,14 @@ class Game:
             2: start_screen.player_2_name
         }
 
-        store_cords, self.time_cords, deck_cords, gold_cords, self.cur_card_cords = self.calculate_cords()
+        store_cords, time_cords, deck_cords, gold_cords, cur_card_cords = self.calculate_cords()
 
         # создаются экземпляры классов
         self.goldCoin = GoldCoin(all_sprites, gold_cords)
         self.deck = Deck(all_sprites, deck_cords)
         self.store = Store(store_cords)
-        self.hand = Hand(self.cur_card_cords)
+        self.hand = Hand(cur_card_cords)
+        self.timer = Timer(time_cords)
 
         tile_map = pygame.image.load('data/TexturedGrass.png')
 
@@ -79,9 +81,6 @@ class Game:
             'red': 0
         }
 
-        self.time = 0
-        self.time_font = pygame.font.SysFont('default', int(32 * SCREEN_SCALE), bold=False)
-
     def calculate_cords(self):
         gap = (0.83 * self.table_size[1] - 277 * SCREEN_SCALE) / 5
         table_width, table_height = self.table_size
@@ -108,28 +107,18 @@ class Game:
             elif self.red_heart.hp <= 0:
                 self.scores['blue'] += 20
             self.game_over(winner)
-        # res = self.game_is_continue()
+
         bg_size = 850
 
         screen.blit(pygame.transform.scale(load_image("BG_main_window.png"), (bg_size * 1.6, bg_size)), (0, 0))
         pygame.draw.rect(screen, '#c3d657', (self.table_cords, self.table_size))
-
-        pygame.draw.rect(screen, '#8ecd65',
-                         ((self.cur_card_cords[0] - 5 * SCREEN_SCALE), (self.cur_card_cords[1] - 5 * SCREEN_SCALE),
-                          int(60 * SCREEN_SCALE), int(75 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
                          (9 * SCREEN_SCALE, 520 * SCREEN_SCALE, int(355 * SCREEN_SCALE), int(95 * SCREEN_SCALE)))
         pygame.draw.rect(screen, '#c3d657',
                          (int(355 * SCREEN_SCALE) + 16, 16 + int(508 * SCREEN_SCALE), int(117 * SCREEN_SCALE),
                           int(95 * SCREEN_SCALE)))
 
-        text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
-
-        screen.blit(text, self.time_cords)
-        # int(32 * SCREEN_SCALE / 0.75281) * 4.2 - это ширина всего таймера,
-        # где 32 * SCREEN_SCALE это текущий размер шрифта таймера,
-        # / 0.75281 это перевод кегля(пункта) в пиксели, а *4.14 это я хотел изначально измерить количество,
-        # так как двоеточие это примерно пятая часть цифры, но по итогу ошибся где то
+        self.timer.draw(screen)
         fullname = os.path.join('data', "Cunia.otf")
         turn_font = pygame.font.Font(fullname, int(9 * SCREEN_SCALE))
         turn_text = turn_font.render("Закончить ход", True, "white")
@@ -229,7 +218,7 @@ class Game:
             self.flip_board()
 
     def is_game_over(self):
-        return self.blue_heart.hp <= 0 or self.red_heart.hp <= 0 or self.time // 60 >= 5
+        return self.blue_heart.hp <= 0 or self.red_heart.hp <= 0 or self.timer.time // 60 >= 5
 
     def who_won(self):
         if self.blue_heart.hp:
@@ -331,7 +320,7 @@ while running:
         elif event.type == events['gold mine'].type:
             game.give_coin(1)
         elif event.type == TIMEVENT.type:
-            game.time += 1
+            game.timer.time += 1
         elif event.type == events['new game'].type:
 
             end_screen.run(event.score, event.winner)
