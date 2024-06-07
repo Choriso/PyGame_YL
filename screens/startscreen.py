@@ -2,21 +2,24 @@ import pygame
 import pygame_gui
 import os
 
-from tech.player import Player
-
 from consts import load_image
+
+# from tech.player import Player
 from tech.music import MusicPlayer
+import auth
 
 
 class StartScreen:
     def __init__(self, width, height, SCREEN_SIZE=1):
 
+        self.error_dialog = None
+        self.player_2_score_box = None
         self.accept_new_player = None
         self.cancel_btn = None
         self.accept_btn = None
         self.sound_slider = None
-        self.input_box2 = None
-        self.input_box1 = None
+        self.player_2_name_box = None
+        self.player_1_name_box = None
         self.signup_2_btn = None
         self.signin_2_btn = None
         self.signup_1_btn = None
@@ -41,15 +44,11 @@ class StartScreen:
 
         self.clock = pygame.time.Clock()
 
-        self.player_1_name = 'Игрок 1'
-        self.player_2_name = 'Игрок 2'
+        self.players_info = [{'name': 'Игрок 1', 'score': 0}, {'name': 'Игрок 2', 'score': 0}]
         self.music_volume = 0
 
         self.player_1_registered = False
         self.player_2_registered = False
-
-        self.player_1 = Player("Игрок 1", "Игрок 1")
-        self.player_2 = Player("Игрок 1", "Игрок 1")
 
         self.create_gui()
 
@@ -92,7 +91,7 @@ class StartScreen:
         fullname = os.path.join('data', "DungeonFont.ttf")
         font = pygame.font.Font(fullname, font_size)
         text_content = "Stratego"
-        text_color = (20, 20, 20)  ##0b252f"
+        text_color = (20, 20, 20)
         self.text_surface = font.render(text_content, True, text_color)
         self.text_rect = self.text_surface.get_rect()
         self.text_rect.center = (self.width // 2, 250)
@@ -100,18 +99,11 @@ class StartScreen:
         self.rules_button = btn_info
         self.start = btn_start
 
-        # players = Player.get_all_players()
-        # if len(players) >= 2:
-        #     self.player_1_name = players[0].name
-        #     self.player_2_name = players[1].name
-
     def close_settings(self):
         self.settings_btn.enable()
-        self.music_volume = self.sound_slider.get_current_value()
 
     def create_settings(self):
         self.settings_btn.disable()
-        window_open = True
         pos_y = 60
         pos_x = 10
         width = 500
@@ -121,7 +113,6 @@ class StartScreen:
             rect=pygame.Rect((130, 50), (width, height)),
             manager=self.manager,
             window_display_title="Настройки",
-
         )
         self.signin_1_btn = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((pos_x + 100, pos_y), ((width - (pos_x * 5 + 100)) / 2, 30)),
@@ -130,7 +121,6 @@ class StartScreen:
             container=self.dialog_settings,
             visible=not self.player_1_registered
         )
-
         self.signup_1_btn = pygame_gui.elements.UIButton(
             relative_rect=pygame.Rect((pos_x + 100 + ((width - (pos_x * 5 + 100)) / 2), pos_y),
                                       ((width - (pos_x * 5 + 100)) / 2, 30)),
@@ -155,38 +145,58 @@ class StartScreen:
             container=self.dialog_settings,
             visible=not self.player_2_registered
         )
-        self.score_1 = pygame_gui.elements.UITextBox(
-            relative_rect=pygame.Rect((pos_x + 100 + (width - (pos_x * 5 + 100)) / 2, pos_y),
-                                      ((width - (pos_x * 5 + 100)) / 2, 30)),
-            html_text="Счёт: " + str(self.player_1.score),
-            manager=self.manager,
-            container=self.dialog_settings,
-            visible=self.player_1_registered
-        )
 
-        self.input_box1 = pygame_gui.elements.UITextEntryLine(
+        self.player_1_name_box = pygame_gui.elements.UITextBox(
             relative_rect=pygame.Rect((pos_x + 100, pos_y), ((width - (pos_x * 5 + 100)) / 2, 30)),
             manager=self.manager,
             container=self.dialog_settings,
-            initial_text=self.player_1_name,
+            html_text='',
+            visible=False
+        )
+
+        self.player_1_score_box = pygame_gui.elements.UITextBox(
+            relative_rect=pygame.Rect((pos_x + 100 + (width - (pos_x * 5 + 100)) / 2, pos_y),
+                                      ((width - (pos_x * 5 + 100)) / 4, 30)),
+            html_text="Счёт: ",
+            manager=self.manager,
+            container=self.dialog_settings,
             visible=self.player_1_registered
         )
-        self.score_2 = pygame_gui.elements.UITextBox(
+
+        self.logout_1_btn = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((pos_x + 100 + 3 * (width - (pos_x * 5 + 100)) / 4, pos_y),
+                                      ((width - (pos_x * 5 + 100)) / 4, 30)),
+            text="Выйти",
+            manager=self.manager,
+            container=self.dialog_settings,
+            visible=False
+        )
+
+        self.player_2_name_box = pygame_gui.elements.UITextBox(
+            relative_rect=pygame.Rect((pos_x + 100, pos_y + 50), ((width - (pos_x * 5 + 100)) / 2, 30)),
+            manager=self.manager,
+            container=self.dialog_settings,
+            html_text='',
+            visible=False
+        )
+        self.player_2_score_box = pygame_gui.elements.UITextBox(
             relative_rect=pygame.Rect((pos_x + 100 + (width - (pos_x * 5 + 100)) / 2, pos_y + 50),
-                                      ((width - (pos_x * 5 + 100)) / 2, 30)),
-            html_text="Счёт: " + str(self.player_1.score),
+                                      ((width - (pos_x * 5 + 100)) / 4, 30)),
+            html_text="Счёт: ",
             manager=self.manager,
             container=self.dialog_settings,
             visible=self.player_2_registered
         )
 
-        self.input_box2 = pygame_gui.elements.UITextEntryLine(
-            relative_rect=pygame.Rect((pos_x + 100, pos_y + 50), ((width - (pos_x * 5 + 100)) / 2, 30)),
+        self.logout_2_btn = pygame_gui.elements.UIButton(
+            relative_rect=pygame.Rect((pos_x + 100 + 3 * (width - (pos_x * 5 + 100)) / 4, pos_y + 50),
+                                      ((width - (pos_x * 5 + 100)) / 4, 30)),
+            text="Выйти",
             manager=self.manager,
             container=self.dialog_settings,
-            initial_text=self.player_2_name,
-            visible=self.player_2_registered
+            visible=False
         )
+
         tittle_text = pygame_gui.elements.UITextBox(
             relative_rect=pygame.Rect((pos_x, pos_y - 50), (width - pos_x * 5, 30)),
             manager=self.manager,
@@ -198,7 +208,6 @@ class StartScreen:
             manager=self.manager,
             html_text="Игрок 1",
             container=self.dialog_settings,
-
         )
         player_2_text = pygame_gui.elements.UITextBox(
             relative_rect=pygame.Rect((pos_x, pos_y + 50), (100, 30)),
@@ -273,23 +282,40 @@ class StartScreen:
             container=self.dialog_signin,
         )
 
-    def succesfull_registration(self, player, data):
-        if player == 1:
-            self.player_1 = data
-            self.player_1_registered = True
-            self.input_box1._set_visible(True)
-            self.signin_1_btn._set_visible(False)
-            self.signup_1_btn._set_visible(False)
-        else:
-            self.player_2 = data
-            self.player_2_registered = True
-            self.input_box2._set_visible(True)
-            self.signin_2_btn._set_visible(False)
-            self.signup_2_btn._set_visible(False)
+    def login(self, player, data):
+        match player:
+            case 1:
+                self.players_info[0] = data
+                self.player_1_registered = True
+
+                self.player_1_name_box.show()
+                self.player_1_name_box.append_html_text(self.players_info[0]['name'])
+
+                self.player_1_score_box.append_html_text(str(self.players_info[0]['score']))
+                self.player_1_score_box.show()
+
+                self.signin_1_btn.hide()
+                self.signup_1_btn.hide()
+                self.logout_1_btn.show()
+
+            case 2:
+
+                self.players_info[1] = data
+                self.player_2_registered = True
+
+                self.player_2_name_box.show()
+                self.player_2_name_box.append_html_text(self.players_info[1]['name'])
+
+                self.player_2_score_box.append_html_text(str(self.players_info[1]['score']))
+                self.player_2_score_box.show()
+
+                self.signin_2_btn.hide()
+                self.signup_2_btn.hide()
+                self.logout_2_btn.show()
 
     def create_signup(self):
         self.dialog_signup = pygame_gui.windows.ui_message_window.UIWindow(
-            rect=pygame.Rect((130, 50), (300, 290)),
+            rect=pygame.Rect((130, 50), (300, 360)),
             manager=self.manager,
             window_display_title="Регистрация",
         )
@@ -321,8 +347,19 @@ class StartScreen:
             manager=self.manager,
             container=self.dialog_signup,
         )
+        self.password_again_text = pygame_gui.elements.UITextBox(
+            relative_rect=pygame.Rect((10, 190), (250, 30)),
+            manager=self.manager,
+            html_text="Повторите пароль:",
+            container=self.dialog_signup,
+        )
+        self.input_box_password_again_signup = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((10, 220), (250, 30)),
+            manager=self.manager,
+            container=self.dialog_signup,
+        )
         self.accept_new_player = pygame_gui.elements.UIButton(
-            relative_rect=pygame.Rect((75, 190), (120, 30)),
+            relative_rect=pygame.Rect((75, 260), (120, 30)),
             text="Регистрация",
             manager=self.manager,
             container=self.dialog_signup,
@@ -344,7 +381,6 @@ class StartScreen:
                         if event.ui_element == self.settings_btn:
                             self.create_settings()
                         elif event.ui_element == self.rules_button:
-                            window_open = True
                             self.rules_button.disable()
                             dialog_info = pygame_gui.windows.ui_message_window.UIWindow(
                                 rect=pygame.Rect((100, 100), (300, 300)),
@@ -376,30 +412,38 @@ class StartScreen:
                         elif event.ui_element == self.signup_2_btn:
                             player_init = 2
                             self.create_signup()
+                        elif event.ui_element == self.logout_1_btn:
+                            self.logout(1)
+                        elif event.ui_element == self.logout_2_btn:
+                            self.logout(2)
                         elif event.ui_element == self.accept_password_btn:
-                            data = Player.check_credentials(self.input_box_name.get_text(),
-                                                            self.input_box_password.get_text())
-                            if data:
-                                self.succesfull_registration(player_init, data)
+                            if self.input_box_name.get_text() == self.players_info[player_init % 2]['name']:
+                                data = 'Такой пользователь уже залогинен'
+                            else:
+                                data = auth.login(self.input_box_name.get_text(),
+                                                              self.input_box_password.get_text())
+                            if type(data) is dict:
+                                self.login(player_init, data)
                             else:
                                 self.error_dialog = pygame_gui.windows.ui_message_window.UIMessageWindow(
                                     rect=pygame.Rect((self.width // 2 - 200, self.height // 2 - 50), (250, 100)),
                                     manager=self.manager,
                                     window_title="Ошибка",
-                                    html_message="Неправильное имя пользователя или пароль",
+                                    html_message=data,
                                 )
                             self.dialog_signin.kill()
                         elif event.ui_element == self.accept_new_player:
-                            data = Player(self.input_box_name_signup.get_text(),
-                                          self.input_box_password_signup.get_text())
-                            if data:
-                                self.succesfull_registration(player_init, data)
+                            data: dict | str = auth.register(self.input_box_name_signup.get_text(),
+                                                             self.input_box_password_signup.get_text(),
+                                                             self.input_box_password_again_signup.get_text())
+                            if type(data) is dict:
+                                self.login(player_init, data)
                             else:
                                 self.error_dialog = pygame_gui.windows.ui_message_window.UIMessageWindow(
                                     rect=pygame.Rect((self.width // 2 - 200, self.height // 2 - 50), (250, 100)),
                                     manager=self.manager,
                                     window_title="Ошибка",
-                                    html_message="Такое имя пользователя уже существует",
+                                    html_message=data,
                                 )
                             self.dialog_signup.kill()
                     if event.user_type == pygame_gui.UI_WINDOW_CLOSE:
@@ -412,4 +456,37 @@ class StartScreen:
             self.screen.blit(self.text_surface, self.text_rect)
             self.manager.update(time_delta)
             self.manager.draw_ui(self.screen)
+            if self.sound_slider:
+                self.music_volume = self.sound_slider.get_current_value()
             pygame.display.flip()
+
+    def logout(self, player):
+        match player:
+            case 1:
+
+                self.players_info[0] = {'name': 'Игрок 1'}
+                self.player_1_registered = False
+
+                self.player_1_name_box.set_text('')
+                self.player_1_name_box.hide()
+
+                self.player_1_score_box.set_text('Счёт: ')
+                self.player_1_score_box.hide()
+
+                self.signin_1_btn.show()
+                self.signup_1_btn.show()
+                self.logout_1_btn.hide()
+
+            case 2:
+                self.players_info[1] = {'name': 'Игрок 2'}
+                self.player_2_registered = False
+
+                self.player_2_name_box.set_text('')
+                self.player_2_name_box.hide()
+
+                self.player_2_score_box.set_text('Счёт: ')
+                self.player_2_score_box.hide()
+
+                self.signin_2_btn.show()
+                self.signup_2_btn.show()
+                self.logout_2_btn.hide()

@@ -34,8 +34,8 @@ class Game:
         self.turn_image = None
         self.turning_button_cords = None
         self.player_names = {
-            1: start_screen.player_1_name,
-            2: start_screen.player_2_name
+            1: start_screen.players_info[0]['name'],
+            2: start_screen.players_info[1]['name']
         }
 
         store_cords, time_cords, deck_cords, gold_cords, cur_card_cords = self.calculate_cords()
