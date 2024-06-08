@@ -146,8 +146,10 @@ class Field:
         self.killed_by_red, self.killed_by_blue = 0, 0
         return k1, k2
 
-    def get_click(self, mouse_pos):
+    def get_click(self, mouse_pos) -> bool | tuple:
         cell = self.get_cell(mouse_pos)
+        if cell is None:
+            return False
         return cell
 
     def get_cell(self, mouse_pos):
@@ -157,21 +159,21 @@ class Field:
             return None
         return cell_x, cell_y
 
-    def on_click(self, cell_coords, group, card, color):
-        if cell_coords[1] >= self.size[1] // 2:
-            hero = card.link(group, color=color)
+    def on_click(self, cell_cords, group, card, player) -> Piece | bool:
+        if cell_cords[1] >= self.size[1] // 2:
+            hero: Piece = card.link(group, color='blue' if player == 1 else 'red')
             if isinstance(hero, Freeze):
-                self.field[cell_coords[1]][cell_coords[0]] = hero, self.field[cell_coords[1]][cell_coords[0]]
-                hero.rect.x = cell_coords[0] * self.cell_size + self.left
-                hero.rect.y = cell_coords[1] * self.cell_size + self.top
+                self.field[cell_cords[1]][cell_cords[0]] = hero, self.field[cell_cords[1]][cell_cords[0]]
+                hero.rect.x = cell_cords[0] * self.cell_size + self.left
+                hero.rect.y = cell_cords[1] * self.cell_size + self.top
                 return hero
             else:
-                if self.field[cell_coords[1]][cell_coords[0]]:
+                if self.field[cell_cords[1]][cell_cords[0]]:
                     group.remove(hero)
                     return False
-                self.field[cell_coords[1]][cell_coords[0]] = hero
-                hero.rect.x = cell_coords[0] * self.cell_size + self.left + 1
-                hero.rect.y = cell_coords[1] * self.cell_size + self.top + 1
+                self.field[cell_cords[1]][cell_cords[0]] = hero
+                hero.rect.x = cell_cords[0] * self.cell_size + self.left + 1
+                hero.rect.y = cell_cords[1] * self.cell_size + self.top + 1
                 return hero
         else:
             return False
@@ -241,8 +243,8 @@ class Field:
 
     def goldmine_num(self, color):
         k = 0
-        for i in self.field:
-            for piece in i:
+        for row in self.field:
+            for piece in row:
                 if isinstance(piece, GoldMine) and piece.color == color:
                     k += 1
         return k

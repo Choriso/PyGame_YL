@@ -11,3 +11,7 @@ class Timer:
     def draw(self, screen):
         text = self.time_font.render(f'{self.time // 60:02}:{self.time % 60:02}', False, 'black')
         screen.blit(text, self.cords)
+
+
+    def is_timer_went_off(self):
+        return self.time // 60 >= 5

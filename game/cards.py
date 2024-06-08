@@ -32,12 +32,12 @@ class Deck(pygame.sprite.Sprite):
 
         self.rect.x,  self.rect.y = cords
 
-        self.cur_card = Card(all_sprites, cur_card)
+        self.cur_card: Card = Card(all_sprites, cur_card)
         self.cur_card.rect.x = self.rect.x
         self.cur_card.rect.y = self.rect.y - 4 * SCREEN_SCALE
         self.group.add(self.cur_card)
 
-    def take_card(self):
+    def take_card(self) -> Card:
         card = self.cur_card
         self.cur_card = Card(all_sprites, choice(('gold mine', 'fence', 'stone fence', 'knight', 'archer', 'rogue',
                                                   'halberdier', 'axeman', 'cavalry', 'ballista', 'freeze', 'bomb')))
@@ -46,7 +46,7 @@ class Deck(pygame.sprite.Sprite):
         self.group.add(self.cur_card)
         return card
 
-    def is_concerning(self, pos):
+    def is_concerning(self, pos) -> bool:
         return bool(self.rect.collidepoint(*pos))
 
 

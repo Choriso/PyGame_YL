@@ -14,7 +14,7 @@ all_sprites = pygame.sprite.Group()
 
 class Store:
     def __init__(self, cords: dict):
-        self.poses = cords
+        self.poses: dict = cords
         first = Card(all_sprites, 'knight')
         first.rect.x, first.rect.y = self.poses[1]
 
@@ -27,25 +27,13 @@ class Store:
         fourth = Card(all_sprites, 'knight')
         fourth.rect.x, fourth.rect.y = self.poses[4]
 
-        self.cur_cards = [first, second, third, fourth]
-
-    def take_cards(self, ind, group):
-        card = self.cur_cards[ind]
-        self.cur_cards[ind] = Card(all_sprites, choice(
-            ('knight', 'archer', 'rogue', 'halberdier', 'axeman', 'cavalry', 'ballista',
-             'freeze')))  # choice(list(CLASSES.keys()))
-        self.cur_cards[ind].rect.x, self.cur_cards[ind].rect.y = self.poses[ind + 1]
-        group.add(self.cur_cards[ind])
-        return card
-
-    def update(self, surface):
-        self.draw_prices(surface)
+        self.cur_cards: list[Card] = [first, second, third, fourth]
 
     def add_sprites(self, group):
         for card in self.cur_cards:
             group.add(card)
 
-    def draw_prices(self, surface):
+    def update(self, surface) -> None:
         for i in range(4):
             radius = int(10 * SCREEN_SCALE)
             pos_x = self.poses[i + 1][0]
@@ -56,11 +44,20 @@ class Store:
             text = font.render(f'{PRICES[self.cur_cards[i].name]}', True, "#895404")
             surface.blit(text, (pos_x - radius // 2.1, pos_y - radius))
 
-    def is_concerning(self, pos):
+    def is_concerning(self, pos: tuple) -> bool | int:
         for i in range(4):
             if self.cur_cards[i].rect.collidepoint(*pos):
-                return True, i
-        return False, -1
+                return i
+        return False
+
+    def take_card(self, ind, group) -> Card:
+        card: Card = self.cur_cards[ind]
+        self.cur_cards[ind] = Card(all_sprites, choice(
+            ('knight', 'archer', 'rogue', 'halberdier', 'axeman', 'cavalry', 'ballista',
+             'freeze')))  # choice(list(CLASSES.keys()))
+        self.cur_cards[ind].rect.x, self.cur_cards[ind].rect.y = self.poses[ind + 1]
+        group.add(self.cur_cards[ind])
+        return card
 
     @staticmethod
     def costs(card):
