@@ -30,3 +30,16 @@ def login(name: str, psw: str) -> str | dict:
         return 'Неправильное имя пользователя или пароль'
     return {'name': user.name, 'score': user.score}
 
+
+def add_score(name: str, score: int):
+    db_sess = db_session.create_session()
+    user: User | None = db_sess.query(User).filter(User.name == name).first()
+    if user:
+        try:
+            user.score += score
+            db_sess.commit()
+            print(f'Успешно добавлено {score} очков пользавтелю {name}')
+        except Exception as e:
+            print(f'Возникла ошибка {e} при добавлении {score} очков пользователю {name}')
+    else:
+        print(f'Пользователь {name} не найден')

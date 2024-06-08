@@ -3,6 +3,7 @@ import os
 import pygame
 
 from consts import load_image, SCREEN_SCALE, CARD_SIZE, COIN_SIZE
+from auth import add_score
 
 from game.store import Store
 from game.cards import Deck
@@ -322,7 +323,7 @@ while running:
         elif event.type == TIMEVENT.type:
             game.timer.time += 1
         elif event.type == events['new game'].type:
-
+            add_score(event.winner, event.score)
             end_screen.run(event.score, event.winner)
             screen = pygame.display.set_mode(start_screen_size)
             all_sprites = pygame.sprite.Group()
