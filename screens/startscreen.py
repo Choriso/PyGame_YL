@@ -4,8 +4,7 @@ import os
 
 from consts import load_image
 
-# from tech.player import Player
-from tech.music import MusicPlayer
+from music import MusicPlayer
 import auth
 
 
