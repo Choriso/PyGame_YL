@@ -66,12 +66,15 @@ class Hand:
     def can_add(self) -> bool:
         return self.players[self.current_color][1] <= 7
 
-    def is_concerning(self, pos: tuple) -> int | bool:
+    def is_concerning(self, pos: tuple[int, int]) -> int | bool:
         hand = self.players[self.current_color][0]
         for i in range(len(hand)):
             if hand[i].rect.collidepoint(*pos):
                 return i
         return False
+
+    def is_concerning_chosen(self, pos: tuple[int, int]) -> bool:
+        return self.chosen and self.chosen.rect.collidepoint(*pos)
 
     def choose(self, ind: int) -> None:
         hand = self.players[self.current_color][0]

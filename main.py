@@ -157,6 +157,7 @@ class Game:
         res3: bool | int = self.hand.is_concerning(pos)
         res4: bool | tuple[int] = self.field.get_click(pos)
         res5: bool = self.is_turn_button_concerning(pos)
+        res6: bool = self.hand.is_concerning_chosen(pos)
 
         # проверяет, стоит ли убирать подсказки для хода
         if self.are_showing_move_hints and not res4:
@@ -218,6 +219,9 @@ class Game:
                     self.hints_params = None
         elif res5 and not self.hand.chosen:
             self.flip_board()
+        elif res6:
+            self.hand.add_card(self.hand.chosen)
+            self.hand.chosen = None
 
     def is_game_over(self) -> bool:
         return self.blue_heart.hp <= 0 or self.red_heart.hp <= 0
